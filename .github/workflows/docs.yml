@@ -1,0 +1,50 @@
+# Build the MkDocs Material site (see mkdocs.yml at repo root) and deploy it to
+# GitHub Pages on every push to master.
+#
+# One-time repo setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+# A new repo's auto-created github-pages environment allows only the `main`
+# branch; this repo is on `master`, so the environment's branch policy has to be
+# widened once or every deploy fails the protection-rules check.
+
+name: docs
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --group docs
+      # The sidebar reading order and the page-footer prev/next arrows are
+      # computed at different times and can drift apart unnoticed.
+      - run: uv run python tools/check_nav_chain.py
+      - run: uv run mkdocs build --strict
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

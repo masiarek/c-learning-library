@@ -1,0 +1,17 @@
+$ make -f trap.mk
+cc -Wall -O2 -c hello.c
+cc -Wall -O2 -c greet.c
+cc -o hello hello.o greet.o
+$ ./hello
+Hello, Ada
+$ sed 's/Hello/Goodbye/' greet.h > greet.h.new && mv greet.h.new greet.h
+$ make -q -f trap.mk
+exit 0
+$ ./hello
+Hello, Ada
+$ make -B -f trap.mk
+cc -Wall -O2 -c hello.c
+cc -Wall -O2 -c greet.c
+cc -o hello hello.o greet.o
+$ ./hello
+Goodbye, Ada

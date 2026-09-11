@@ -1,0 +1,4 @@
+# What `make` writes here. The Makefiles and the three sources are what we keep.
+hello
+*.o
+*.d

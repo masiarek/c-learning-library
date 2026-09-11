@@ -1,0 +1,3 @@
+# The programs the Makefile writes -- the same two lines the talk's benchmarks/.gitignore uses.
+variant.*
+!variant.c

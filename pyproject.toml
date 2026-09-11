@@ -1,0 +1,24 @@
+[project]
+name = "c-learning-library"
+version = "0.1.0"
+description = "A runnable learning library about C — how a program is written, built and run — one idea per page, every claim backed by a program that runs, published as a searchable site."
+requires-python = ">=3.11"
+dependencies = []
+
+# Not an installable package — just a place to pin the docs toolchain so CI and
+# the local preview resolve the exact same versions from uv.lock.
+[tool.uv]
+package = false
+
+[dependency-groups]
+# The MkDocs site build. To change a docs dependency, edit here and run `uv lock`.
+#
+# Note what is NOT here: anything the examples need. They are C compiled by
+# whatever `cc` the machine already has (Apple clang on a Mac, GCC on Linux),
+# bash scripts, and the `make` on the PATH (GNU Make 3.81 on a Mac, 4.x on
+# Linux). Installing nothing is the point: the differences between those two
+# machines are half of what this library measures.
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocs-same-dir==0.1.3",
+]

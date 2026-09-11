@@ -1,0 +1,40 @@
+# Every example must run and print exactly what its recorded .out file says — and
+# every lesson page's generated output block must match that run.
+#
+#   examples/*.c    compiled with `cc -std=c17 -Wall -Wextra -pedantic`, no libraries
+#   examples/*.sh   bash — mostly driving `cc` and `make` over a lesson's demo/ folder
+#
+# It runs on BOTH Ubuntu and macOS on purpose, and for this library the matrix is
+# three differences at once, not one: `cc` is GCC on the Ubuntu runner and Apple
+# clang on the Mac; the Ubuntu runner is x86-64 and the Mac is arm64; and `make`
+# is GNU Make 4.x on Ubuntu but Apple's GNU Make 3.81 (2006) on the Mac. An answer
+# key has to be something all three pairs agree on. See CONTRIBUTING.md,
+# "Two compilers, two CPUs, two makes".
+
+name: examples
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show toolchain
+        run: |
+          cc --version | head -1
+          make --version | head -1
+          bash --version | head -1
+          uname -sm
+      - name: Run every example and check it against its answer key
+        run: python3 tools/run_examples.py --check
+      - name: Check that every external link is marked as external
+        run: python3 tools/check_link_style.py

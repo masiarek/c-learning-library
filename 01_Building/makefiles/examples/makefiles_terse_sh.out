@@ -1,0 +1,22 @@
+$ make -f terse.mk
+cc -Wall -O2 -MMD -MP   -c -o hello.o hello.c
+cc -Wall -O2 -MMD -MP   -c -o greet.o greet.c
+cc   hello.o greet.o   -o hello
+$ ./hello
+Hello, Ada
+$ make -q -f terse.mk
+exit 0
+$ mv hello.c main.c
+$ printf 'CFLAGS = -Wall -O2\n\nhello: main.o greet.o\n' > named.mk
+$ make -f named.mk
+cc -Wall -O2   -c -o main.o main.c
+cc -Wall -O2   -c -o greet.o greet.c
+$ make -f named.mk
+exit 0
+$ ls
+greet.c
+greet.h
+greet.o
+main.c
+main.o
+named.mk

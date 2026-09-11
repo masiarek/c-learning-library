@@ -1,0 +1,19 @@
+$ make -f deps.mk
+cc -Wall -O2 -MMD -MP -c hello.c
+cc -Wall -O2 -MMD -MP -c greet.c
+cc -o hello hello.o greet.o
+$ cat greet.d
+greet.o: greet.c greet.h
+greet.h:
+$ cat hello.d
+hello.o: hello.c greet.h
+greet.h:
+$ sed 's/Hello/Goodbye/' greet.h > greet.h.new && mv greet.h.new greet.h
+$ make -q -f deps.mk
+exit 1
+$ make -f deps.mk
+cc -Wall -O2 -MMD -MP -c hello.c
+cc -Wall -O2 -MMD -MP -c greet.c
+cc -o hello hello.o greet.o
+$ ./hello
+Goodbye, Ada

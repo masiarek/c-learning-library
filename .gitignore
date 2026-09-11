@@ -1,0 +1,19 @@
+# MkDocs build output — generated, never committed.
+site/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# JetBrains IDEs (RustRover / PyCharm) — per-machine project config.
+.idea/
+
+# C build output. A lesson's demo/ folder carries its own .gitignore naming the
+# programs its Makefile writes; these are the files every C build leaves behind.
+*.o
+*.d
+*.dSYM/

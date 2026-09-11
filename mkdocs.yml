@@ -1,0 +1,116 @@
+# MkDocs Material site for the whole repo — publishes every Markdown page as a
+# searchable website on GitHub Pages.
+#
+#   Local preview:  uv run --group docs mkdocs serve
+#                   (toolchain pinned in pyproject.toml [dependency-groups].docs + uv.lock)
+#   Deploy:         .github/workflows/docs.yml builds on every push to master
+#                   (one-time setup: repo Settings → Pages → Source: GitHub Actions,
+#                    and widen the github-pages environment's branch policy to master)
+#
+# The docs root IS the repo root (mkdocs-same-dir), so there is no docs/ copy step:
+# the same Markdown GitHub renders is what the site serves, and the example sources
+# (.c / .sh) and every demo/ folder's Makefile are carried through as static files,
+# byte for byte, so links to them keep working — which matters here, because the
+# site's Markdown renderer turns a TAB inside a code fence into spaces and the
+# demo files are the only copy of a Makefile a reader can take as-is.
+
+site_name: C — Learning Library
+site_description: How a C program is written, built and run — one idea per page, every claim backed by a program that runs and is checked against its recorded output in CI, under GCC on Linux and clang on macOS.
+site_url: https://masiarek.github.io/c-learning-library/
+repo_url: https://github.com/masiarek/c-learning-library
+repo_name: masiarek/c-learning-library
+edit_uri: edit/master/
+
+docs_dir: .
+site_dir: site
+
+# Cross-links are authored for GitHub's file-relative rendering (including links
+# to a folder's README.md). Plain .html pages keep those exact semantics; pretty
+# directory URLs would shift every page one level deeper and break them.
+use_directory_urls: false
+
+# MkDocs maps README.md onto index.md, so the root README and index.md collide.
+# Excluding it is right rather than a workaround: its content already IS the
+# homepage, inlined by index.md through pymdownx.snippets, which reads from disk
+# and so is unaffected. GitHub still renders it as the repo front page.
+#
+# The leading slash anchors the pattern to the repo root. Without it, .gitignore
+# semantics would match README.md at ANY depth and silently delete every folder's
+# section landing page from the site.
+exclude_docs: |
+  /README.md
+  __pycache__/
+
+# Built and linkable, but kept out of the sidebar: house conventions are for
+# someone about to write a page, not for a reader browsing lessons.
+not_in_nav: |
+  /CONTRIBUTING.md
+
+theme:
+  name: material
+  icon:
+    logo: material/language-c
+  features:
+    - navigation.indexes    # a folder's README.md becomes its section landing page
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue grey
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue grey
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+# Build-time fixes that would otherwise need a plugin (and a new pinned
+# dependency): sidebar section labels, which MkDocs derives from folder names,
+# reading order, and the footer's prev/next chain.
+hooks:
+  - mkdocs_hooks.py
+
+plugins:
+  - search
+  - same-dir
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  # Mermaid diagrams. The custom fence is what makes ```mermaid render as a
+  # diagram on the site; GitHub renders the same fence natively, so one source
+  # serves both surfaces. Without it the fence ships as a grey code block.
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  # Lets index.md inline sections of README.md, so the repo front page and the
+  # site homepage share one source and cannot drift.
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/masiarek/c-learning-library

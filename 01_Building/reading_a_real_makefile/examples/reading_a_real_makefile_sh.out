@@ -1,0 +1,29 @@
+$ make -n
+cc -std=c17 -Wall -Wextra -O2 -DVARIANT=alpha variant.c -o variant.alpha
+cc -std=c17 -Wall -Wextra -O2 -DVARIANT=beta variant.c -o variant.beta
+cc -std=c17 -Wall -Wextra -O2 -DVARIANT=gamma variant.c -o variant.gamma
+$ make
+cc -std=c17 -Wall -Wextra -O2 -DVARIANT=alpha variant.c -o variant.alpha
+cc -std=c17 -Wall -Wextra -O2 -DVARIANT=beta variant.c -o variant.beta
+cc -std=c17 -Wall -Wextra -O2 -DVARIANT=gamma variant.c -o variant.gamma
+$ make run
+=== variant.alpha ===
+variant alpha
+=== variant.beta ===
+variant beta
+=== variant.gamma ===
+variant gamma
+$ make run ARGS='--fast --verbose'
+=== variant.alpha ===
+variant alpha --fast --verbose
+=== variant.beta ===
+variant beta --fast --verbose
+=== variant.gamma ===
+variant gamma --fast --verbose
+$ make -q
+exit 0
+$ sed "s/[$][$]@/\$@/" Makefile > onedollar.mk
+$ grep -e '-o ' onedollar.mk
+	$(CC) $(CFLAGS) -DVARIANT=$(1) $(SOURCES) -o $@
+$ make -n -B -f onedollar.mk variant.alpha
+cc -std=c17 -Wall -Wextra -O2 -DVARIANT=alpha variant.c -o 

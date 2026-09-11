@@ -1,0 +1,23 @@
+$ make
+cc -Wall -O2 -c hello.c
+cc -Wall -O2 -c greet.c
+cc -o hello hello.o greet.o
+$ ./hello
+Hello, Ada
+$ make -q
+exit 0
+$ touch greet.c
+$ make -q
+exit 1
+$ make
+cc -Wall -O2 -c greet.c
+cc -o hello hello.o greet.o
+$ touch greet.h
+$ make -n
+cc -Wall -O2 -c hello.c
+cc -Wall -O2 -c greet.c
+cc -o hello hello.o greet.o
+$ make
+cc -Wall -O2 -c hello.c
+cc -Wall -O2 -c greet.c
+cc -o hello hello.o greet.o

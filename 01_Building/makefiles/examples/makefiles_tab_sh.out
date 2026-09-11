@@ -1,0 +1,15 @@
+$ expand -t 4 Makefile > spaces.mk
+$ make -f spaces.mk
+spaces.mk:5: *** missing separator.  Stop.
+$ head -5 Makefile | cat -et
+CC     = cc$
+CFLAGS = -Wall -O2$
+$
+hello: hello.o greet.o$
+^I$(CC) -o hello hello.o greet.o$
+$ head -5 spaces.mk | cat -et
+CC     = cc$
+CFLAGS = -Wall -O2$
+$
+hello: hello.o greet.o$
+    $(CC) -o hello hello.o greet.o$

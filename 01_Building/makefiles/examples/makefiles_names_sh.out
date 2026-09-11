@@ -1,0 +1,16 @@
+$ make
+cc -Wall -O2 -c hello.c
+cc -Wall -O2 -c greet.c
+cc -o hello hello.o greet.o
+$ sed 's/Hello/Goodbye/' greet.h > greet.h.new && mv greet.h.new greet.h
+$ touch -t 202001010000 greet.h
+$ make -q
+exit 0
+$ ./hello
+Hello, Ada
+$ touch clean
+$ make -q clean
+exit 1
+$ grep -v '^[.]PHONY' Makefile > nophony.mk
+$ make -q -f nophony.mk clean
+exit 0
