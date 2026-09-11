@@ -12,7 +12,7 @@ Being able to build, read and debug C you did not write — a repository with a 
 
 - **The page** — one idea, opening with the version that works, then the trap.
 - **`examples/`** — the programs behind the page. A block marked *Verified output* was pasted in by a tool from a real run, and CI runs it again on Ubuntu and on macOS on every push.
-- **`demo/`** — files meant to be copied: a Makefile and the sources it builds. Take them from the folder (or from GitHub), not from the rendered page — this site's renderer turns a Makefile's TABs into spaces, and `make` refuses spaces.
+- **`demo/`** — files meant to be copied: a Makefile and the sources it builds. A Makefile shown on a page is the demo file byte for byte, TABs included — which matters, because `make` refuses a recipe line indented with spaces.
 - **A fence titled *Real output — …*** — one run on one named machine, kept because it shows a difference between machines. CI does not re-run it, and its title says where it came from.
 
 ## Running an example yourself

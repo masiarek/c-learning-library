@@ -34,7 +34,7 @@ clean:
 	rm -f hello hello.o greet.o
 ```
 
-It is [`demo/Makefile`](demo/Makefile), beside [`hello.c`](demo/hello.c), [`greet.c`](demo/greet.c) and [`greet.h`](demo/greet.h) and the three variants this page comes to — [`trap.mk`](demo/trap.mk), [`deps.mk`](demo/deps.mk) and [`terse.mk`](demo/terse.mk). Take them from the folder rather than copying them off this page; [the TAB](#the-tab) is why.
+It is [`demo/Makefile`](demo/Makefile), beside [`hello.c`](demo/hello.c), [`greet.c`](demo/greet.c) and [`greet.h`](demo/greet.h) and the three variants this page comes to — [`trap.mk`](demo/trap.mk), [`deps.mk`](demo/deps.mk) and [`terse.mk`](demo/terse.mk). The Makefiles on this page are those files byte for byte, [TABs](#the-tab) included.
 
 | In the file | Called | What `make` does with it |
 |---|---|---|
@@ -142,7 +142,7 @@ hello: hello.o greet.o$
 
 `cat -et` shows the TAB as `^I` and marks each line end with `$`; apart from that one byte the two files are identical, and on screen you cannot tell them apart. When the indentation is exactly eight spaces, `make` adds a hint — `missing separator (did you mean TAB instead of 8 spaces?)` — and for the four an editor usually inserts it says nothing more.
 
-**Copying a Makefile off a web page is an easy way to lose the TAB.** This site is built by Python-Markdown 3.10.3, which expands every TAB in a page to spaces before it renders a code block — so every Makefile on this page arrives on the site with four spaces where its TAB was, and a copy of it fails exactly as `spaces.mk` did. GitHub's renderer keeps the TAB. The files in [`demo/`](demo/Makefile) are the real bytes.
+**Copying a Makefile off a web page is an easy way to lose the TAB.** Python-Markdown 3.10.3, which builds this site, expands every TAB in a page to spaces before it renders a code block, so on a site built with its defaults a Makefile arrives with four spaces where each TAB was, and a copy of it fails exactly as `spaces.mk` did. This site turns on SuperFences' [`preserve_tabs` ↗](https://facelessuser.github.io/pymdown-extensions/extensions/superfences/#preserve-tabs), which keeps the TABs inside a code block, so every recipe line on this page reaches your browser starting with its `0x09`, as it does on GitHub — and the site's build fails if a page ever loses one.
 
 Since GNU Make 3.82 (2010) a Makefile can choose another prefix with `.RECIPEPREFIX = >`, and 4.3 and 4.4.1 honour it; 3.81 ignores the assignment and stops at the first `>` with `missing separator`.
 

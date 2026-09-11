@@ -10,9 +10,7 @@
 # The docs root IS the repo root (mkdocs-same-dir), so there is no docs/ copy step:
 # the same Markdown GitHub renders is what the site serves, and the example sources
 # (.c / .sh) and every demo/ folder's Makefile are carried through as static files,
-# byte for byte, so links to them keep working — which matters here, because the
-# site's Markdown renderer turns a TAB inside a code fence into spaces and the
-# demo files are the only copy of a Makefile a reader can take as-is.
+# byte for byte, so links to them keep working.
 
 site_name: C — Learning Library
 site_description: How a C program is written, built and run — one idea per page, every claim backed by a program that runs and is checked against its recorded output in CI, under GCC on Linux and clang on macOS.
@@ -100,6 +98,11 @@ markdown_extensions:
   # diagram on the site; GitHub renders the same fence natively, so one source
   # serves both surfaces. Without it the fence ships as a grey code block.
   - pymdownx.superfences:
+      # Keep the TABs inside a code block: Python-Markdown expands every TAB in
+      # a page to spaces before any fence is parsed, and a Makefile's recipe
+      # lines must start with a TAB. mkdocs_hooks.py fails the strict build if a
+      # page's HTML ever holds fewer TABs than its fences.
+      preserve_tabs: true
       custom_fences:
         - name: mermaid
           class: mermaid

@@ -20,7 +20,7 @@ House rules for writing a page here. Readers browsing lessons do not need this f
 
 One idea per folder. The folder name is the idea, in `lower_snake_case`, and it becomes a permanent URL — so name it for what it teaches, not for where it sits in the reading order. A C example is `examples/<stem>_c.c` and a script is `examples/<stem>_sh.sh`: a page names an example by its bare stem, so stems must be unique across languages, and the suffix is how.
 
-**`demo/` holds the files a reader copies**, and it exists because the site cannot deliver a TAB. Its Markdown renderer expands every TAB inside a code fence to spaces — measured on this site's own build — so a Makefile copied off the rendered page fails with `missing separator`. The file in `demo/` is the real one and a fence on the page is a picture of it: copy a Makefile into a fence with a command, never by retyping it, and copy it again when the file changes. Scripts never build inside `demo/` — they copy it to a `mktemp -d` and work there, so the lesson folder stays clean.
+**`demo/` holds the files a reader copies**, and a fence on the page is a picture of one: copy a Makefile into a fence with a command, never by retyping it, and copy it again when the file changes. The site keeps the TABs inside fences — SuperFences' `preserve_tabs`, because Python-Markdown would otherwise expand every TAB to spaces and a copied Makefile would fail with `missing separator` — and `mkdocs_hooks.py` fails the strict build if a page's HTML ever holds fewer TABs than its fences. Scripts never build inside `demo/` — they copy it to a `mktemp -d` and work there, so the lesson folder stays clean.
 
 ## The page
 
