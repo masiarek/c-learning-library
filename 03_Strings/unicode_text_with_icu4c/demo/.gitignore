@@ -1,0 +1,3 @@
+# What `make` writes here. The Makefile and hello_icu.c are what we keep.
+hello_icu
+icu_*_c

@@ -1,0 +1,9 @@
+composed           63 61 66 c3 a9
+decomposed         63 61 66 65 cc 81
+strcmp:            different
+NFC(composed)      63 61 66 c3 a9
+NFC(decomposed)    63 61 66 c3 a9
+strcmp after NFC:  equal
+NFD(composed)      63 61 66 65 cc 81
+NFKC("ﬁle №①"):   file No1
+status:            U_ZERO_ERROR

@@ -1,7 +1,8 @@
 # Every example must run and print exactly what its recorded .out file says — and
 # every lesson page's generated output block must match that run.
 #
-#   examples/*.c    compiled with `cc -std=c17 -Wall -Wextra -pedantic`, no libraries
+#   examples/*.c    compiled with `cc -std=c17 -Wall -Wextra -pedantic` — libc only,
+#                   except the ICU4C lesson's, which link ICU through pkg-config
 #   examples/*.sh   bash — mostly driving `cc` and `make` over a lesson's demo/ folder
 #
 # It runs on BOTH Ubuntu and macOS on purpose, and for this library the matrix is
@@ -28,11 +29,26 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      # 03_Strings/unicode_text_with_icu4c builds against ICU. Ubuntu 24.04 packages
+      # ICU 74; Homebrew has the current release, keg-only, so pkg-config is told
+      # where the keg is — the same line the lesson gives a reader.
+      - name: Install ICU (Ubuntu)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libicu-dev pkg-config
+      - name: Install ICU (macOS)
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+        run: |
+          brew install icu4c pkgconf
+          echo "PKG_CONFIG_PATH=$(brew --prefix icu4c)/lib/pkgconfig" >> "$GITHUB_ENV"
       - name: Show toolchain
         run: |
           cc --version | head -1
           make --version | head -1
           bash --version | head -1
+          echo "ICU $(pkg-config --modversion icu-uc)"
           uname -sm
       - name: Run every example and check it against its answer key
         run: python3 tools/run_examples.py --check

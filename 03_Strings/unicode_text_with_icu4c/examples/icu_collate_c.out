@@ -1,0 +1,9 @@
+strcmp                  Lwów Ofen Orange Zoo apple zebra Öl Łódź
+en                      apple Łódź Lwów Ofen Öl Orange zebra Zoo
+sv                      apple Łódź Lwów Ofen Orange zebra Zoo Öl
+pl                      apple Lwów Łódź Ofen Öl Orange zebra Zoo
+de@collation=phonebook  apple Łódź Lwów Öl Ofen Orange zebra Zoo
+ucol_open("sv"): U_ZERO_ERROR, rules from sv
+ucol_open("de"): U_USING_DEFAULT_WARNING, rules from root
+ucol_open("xx"): U_USING_DEFAULT_WARNING, rules from root
+primary strength: "cafe" == "CAFÉ"

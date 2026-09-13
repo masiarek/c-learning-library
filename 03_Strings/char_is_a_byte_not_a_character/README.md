@@ -80,7 +80,7 @@ byte 0xc3 asked through unsigned char: isalpha = 0, isprint = 0
 
 **Five bytes, four letters.** `strlen` returns 5 because the é is `c3 a9` in UTF-8 — two bytes, two `char`s. C has no count of letters to give you; it has bytes, and the only length it knows is the byte length.
 
-**`toupper` touches ASCII and passes the rest through.** Upper-casing each byte turns `caf` into `CAF` and leaves `c3 a9` exactly as they were. `toupper` works one byte at a time and knows only the ASCII letters, so an accented letter is beyond it — the same limit as Python's `bytes.upper()` and Rust's `to_ascii_uppercase()`. Changing the case of *café* to *CAFÉ* is not a byte operation, and C's standard library does not offer it.
+**`toupper` touches ASCII and passes the rest through.** Upper-casing each byte turns `caf` into `CAF` and leaves `c3 a9` exactly as they were. `toupper` works one byte at a time and knows only the ASCII letters, so an accented letter is beyond it — the same limit as Python's `bytes.upper()` and Rust's `to_ascii_uppercase()`. Changing the case of *café* to *CAFÉ* is not a byte operation, and C's standard library does not offer it — [ICU4C](../unicode_text_with_icu4c/README.md) does.
 
 **The cut lands inside a letter, and C does not notice.** The first four bytes are `caf` and then `c3` — the accent's lead byte, alone, with its second half left behind. C hands you four bytes and asks nothing; there is no such thing as a character boundary to it. Python's `.decode()` and Rust's `from_utf8()` both refuse this exact four-byte prefix, which is the whole difference between bytes and checked text.
 
@@ -200,6 +200,7 @@ bytes reversed: ��fac
 
 - [A string is bytes up to a NUL](../a_string_is_bytes_up_to_a_nul/README.md) — the byte the terminator counts, before we asked what it means
 - [Parsing a number from text](../parsing_a_number_from_text/README.md) — the other place bytes have to become something, and the checks C leaves to you
+- [ICU4C: Unicode text in C](../unicode_text_with_icu4c/README.md) — the library that upper-cases *café* properly, counts its characters, and knows where a cut is safe
 - [A code point is not a character ↗](https://masiarek.github.io/encodings-learning-library/02_Characters/a_code_point_is_not_a_character/index.html) — the level below the letter, where even Python's count stops being enough
 - [Case is not a per-character operation ↗](https://masiarek.github.io/encodings-learning-library/02_Characters/case_is_not_per_character/index.html) — why upper-casing is not a byte-by-byte job in any language
 - [C or Rust for text ↗](https://masiarek.github.io/encodings-learning-library/10_Best_Practices/c_or_rust_for_text/index.html) — `char` as one type that is not a text type, measured against Rust's two

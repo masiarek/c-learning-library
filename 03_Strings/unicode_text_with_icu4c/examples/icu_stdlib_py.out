@@ -1,0 +1,11 @@
+UTF-8 bytes 15, UTF-16 units 10, code points 8, characters: not in the standard library
+'straße'.upper()   = 'STRASSE'
+'istanbul'.upper() = 'ISTANBUL'  -- upper() takes no locale
+'Straße'.casefold() == 'STRASSE'.casefold(): True
+composed == decomposed: False; after NFC: True
+NFKC('ﬁle №①') = 'file No1'
+sorted(): Lwów Ofen Orange Zoo apple zebra Öl Łódź  -- code point order, strcmp's answer
+decode('cp1250')  = 'Kraków, Wrocław, Gdańsk'
+decode('latin-1') = 'Kraków, Wroc³aw, Gdañsk'  -- no error here either
+'café'.encode('ascii') -> UnicodeEncodeError: ordinal not in range(128)  -- strict by default
+'café'.encode('ascii', errors='replace') = b'caf?'

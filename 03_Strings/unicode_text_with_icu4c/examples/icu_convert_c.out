@@ -1,0 +1,7 @@
+read as cp1250:     Kraków, Wrocław, Gdańsk  (23 bytes -> 26, U_ZERO_ERROR)
+read as ISO-8859-1: Kraków, Wroc³aw, Gdañsk  (U_ZERO_ERROR)
+ucnv_open("cp1250"): U_ZERO_ERROR, table ibm-5346_P100-1998
+ucnv_open("windows-1250"): U_AMBIGUOUS_ALIAS_WARNING, table ibm-5346_P100-1998
+ucnv_open("ISO-8859-2"): U_ZERO_ERROR, table ibm-912_P100-1995
+to US-ASCII, default callback: 63 61 66 1a  (U_ZERO_ERROR)
+to US-ASCII, STOP callback:    3 bytes  (U_INVALID_CHAR_FOUND)

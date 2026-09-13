@@ -1,0 +1,9 @@
+preflight:      need 10 UTF-16 units, status U_BUFFER_OVERFLOW_ERROR
+convert:        status U_ZERO_ERROR
+UTF-8 bytes     strlen          15
+UTF-16 units    u_strlen        10
+code points     u_countChar32   8
+safe cuts at byte 0 1 2 3 6 7 15
+characters      ubrk_next       6  (status U_ZERO_ERROR)
+stale status:   length still -1, status U_BUFFER_OVERFLOW_ERROR
+"caf\xc3":      status U_INVALID_CHAR_FOUND

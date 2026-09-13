@@ -1,0 +1,10 @@
+upper, root locale: straße -> STRASSE
+upper, root locale: istanbul -> ISTANBUL
+upper, tr locale: istanbul -> İSTANBUL
+lower, root locale: DİYARBAKIR -> di̇yarbakir
+lower, tr locale: DİYARBAKIR -> diyarbakır
+fold, root locale: Straße -> strasse
+fold, root locale: STRASSE -> strasse
+capacity 8: returns 7, status U_ZERO_ERROR, U_SUCCESS 1
+capacity 7: returns 7, status U_STRING_NOT_TERMINATED_WARNING, U_SUCCESS 1
+capacity 6: returns 7, status U_BUFFER_OVERFLOW_ERROR, U_SUCCESS 0

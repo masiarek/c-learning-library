@@ -14,7 +14,9 @@ the lesson and a hand-copied fence could quietly drift from the file CI runs.
 Four kinds of example, told apart by extension
 ----------------------------------------------
     examples/<stem>.c     compiled with `cc -std=c17 -Wall -Wextra -pedantic` -- Apple
-                          clang on a Mac, GCC on Linux, and the key must match both
+                          clang on a Mac, GCC on Linux, and the key must match both.
+                          libc only, unless its opening comment's build command
+                          says `$(pkg-config --cflags --libs MODULE...)`
     examples/<stem>.sh    run as `bash <stem>.sh` -- mostly driving `cc` and `make`
                           over a scratch copy of the lesson's demo/ folder
     examples/<stem>.py    stdlib-only Python, run as `python3 -I <stem>.py`
@@ -49,8 +51,10 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import functools
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -61,6 +65,23 @@ EDITION = "2024"
 
 # extension -> (how the page labels the source fence, how the tool runs it)
 LANGS = {".py": "python", ".rs": "rust", ".sh": "bash", ".c": "c"}
+
+# A C example that needs a library beyond libc says so the way a reader is told:
+# its opening comment carries the build command, and the tool asks pkg-config the
+# same question that command does.
+#
+#     Build: cc -std=c17 ... icu_case_c.c $(pkg-config --cflags --libs icu-uc) -o icu_case_c
+PKG_CONFIG = re.compile(r"\$\(pkg-config --cflags --libs (?P<modules>[\w.+\- ]+)\)")
+
+# Homebrew installs some libraries keg-only -- not linked into its prefix -- so
+# pkg-config cannot find them until PKG_CONFIG_PATH names the keg, which is what
+# `brew info icu4c` tells a reader to set. pkg-config module -> Homebrew formula.
+BREW_KEG_ONLY = {"icu-uc": "icu4c", "icu-i18n": "icu4c", "icu-io": "icu4c"}
+
+LIBRARY_HINT = (
+    "  macOS:          brew install icu4c pkgconf\n"
+    "  Debian/Ubuntu:  sudo apt install libicu-dev pkg-config\n"
+)
 
 # <!-- output:stem -->  ...generated...  <!-- /output -->
 # <!-- source:stem -->  ...generated...  <!-- /source -->
@@ -120,6 +141,22 @@ def find_examples() -> dict[str, Path]:
     return found
 
 
+@functools.cache
+def keg_only_pkgconfig_dirs() -> tuple[str, ...]:
+    """The lib/pkgconfig folders of the BREW_KEG_ONLY formulas installed here, if any."""
+    if shutil.which("brew") is None:
+        return ()
+    dirs: list[str] = []
+    for formula in sorted(set(BREW_KEG_ONLY.values())):
+        done = subprocess.run(
+            ["brew", "--prefix", "--installed", formula], capture_output=True, text=True
+        )
+        pc = Path(done.stdout.strip()) / "lib" / "pkgconfig"
+        if done.returncode == 0 and pc.is_dir():
+            dirs.append(str(pc))
+    return tuple(dirs)
+
+
 def fixed_env() -> dict[str, str]:
     """One environment for every run, so the key is the program's and not the machine's."""
     env = dict(os.environ)
@@ -127,7 +164,30 @@ def fixed_env() -> dict[str, str]:
         if k.startswith("LC_") or k in {"LANG", "LANGUAGE"}:
             del env[k]
     env.update({"LC_ALL": "C", "LANG": "C", "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"})
+    # After whatever PKG_CONFIG_PATH the caller set, so their own choice still wins.
+    kegs = keg_only_pkgconfig_dirs()
+    if kegs:
+        own = [d for d in env.get("PKG_CONFIG_PATH", "").split(os.pathsep) if d]
+        env["PKG_CONFIG_PATH"] = os.pathsep.join(own + [d for d in kegs if d not in own])
     return env
+
+
+def library_flags(src: Path, env: dict[str, str]) -> list[str]:
+    """Compiler and linker flags for the pkg-config modules a C example's opening comment names."""
+    opening_comment = src.read_text(encoding="utf-8").split("*/", 1)[0]
+    m = PKG_CONFIG.search(opening_comment)
+    if not m:
+        return []
+    modules = m.group("modules").split()
+    where = f"{src.relative_to(REPO)} builds against {' '.join(modules)}"
+    if shutil.which("pkg-config") is None:
+        sys.exit(f"ERROR: {where}, and pkg-config is not on PATH\n{LIBRARY_HINT}")
+    done = subprocess.run(
+        ["pkg-config", "--cflags", "--libs", *modules], capture_output=True, text=True, env=env
+    )
+    if done.returncode != 0:
+        sys.exit(f"ERROR: {where}, which pkg-config cannot find\n{done.stderr}{LIBRARY_HINT}")
+    return done.stdout.split()
 
 
 def _decode(raw: bytes) -> str:
@@ -147,7 +207,10 @@ def run_example(src: Path, workdir: Path) -> str:
         if src.suffix == ".rs":
             build_cmd = ["rustc", "--edition", EDITION, str(src), "-o", str(binary)]
         else:
-            build_cmd = ["cc", "-std=c17", "-Wall", "-Wextra", "-pedantic", str(src), "-o", str(binary)]
+            build_cmd = [
+                "cc", "-std=c17", "-Wall", "-Wextra", "-pedantic",
+                str(src), *library_flags(src, env), "-o", str(binary),
+            ]
         build = subprocess.run(build_cmd, capture_output=True, text=True)
         if build.returncode != 0:
             sys.exit(f"ERROR: {src.relative_to(REPO)} failed to compile\n{build.stderr}")

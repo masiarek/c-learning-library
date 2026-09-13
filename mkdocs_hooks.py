@@ -92,7 +92,8 @@ NAV_ORDER: dict[str, list[str]] = {
         "function_start_patterns",
     ],
     # The string, taken apart: the terminator, then the byte that is not a
-    # letter, then the functions with no length, reading a number, the format.
+    # letter, then the functions with no length, reading a number, the format;
+    # then the library that does what the lessons before it show libc cannot.
     "03_Strings": [
         "README.md",
         "a_string_is_bytes_up_to_a_nul",
@@ -100,6 +101,7 @@ NAV_ORDER: dict[str, list[str]] = {
         "the_functions_that_do_not_check",
         "parsing_a_number_from_text",
         "a_format_string_is_a_program",
+        "unicode_text_with_icu4c",
     ],
     "04_Debugging": [
         "README.md",

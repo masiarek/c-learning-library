@@ -36,7 +36,7 @@ More are planned; [00_Start_Here](00_Start_Here/README.md) has the list.
 
 ## What you need
 
-A C compiler and `make`. On a Mac: `xcode-select --install`. On Debian or Ubuntu: `sudo apt install build-essential`. Nothing else — no libraries, no package manager, no IDE. The [Decompiling](02_Decompiling/README.md) chapter also drives Ghidra — `brew install ghidra` on a Mac — but every Ghidra result is on the page, so you need it only to reproduce them. The [Debugging](04_Debugging/README.md) chapter's transcripts come from `lldb`, which the Command Line Tools include, and from `gdb` in an Ubuntu container.
+A C compiler and `make`. On a Mac: `xcode-select --install`. On Debian or Ubuntu: `sudo apt install build-essential`. Nothing else — no package manager, no IDE, and one library, for one lesson: [ICU4C](03_Strings/unicode_text_with_icu4c/README.md) builds against ICU (`brew install icu4c pkgconf` on a Mac, `sudo apt install libicu-dev pkg-config` on Debian or Ubuntu). The [Decompiling](02_Decompiling/README.md) chapter also drives Ghidra — `brew install ghidra` on a Mac — but every Ghidra result is on the page, so you need it only to reproduce them. The [Debugging](04_Debugging/README.md) chapter's transcripts come from `lldb`, which the Command Line Tools include, and from `gdb` in an Ubuntu container.
 
 ## See also
 

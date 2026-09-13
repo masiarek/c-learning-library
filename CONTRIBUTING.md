@@ -51,6 +51,8 @@ python3 tools/check_all.py --committed             # the same gates on git archi
 
 **C: `cc -std=c17 -Wall -Wextra -pedantic`, libc only.** One file per example, compiled and run from its own folder. A warning is reported as a note, not a failure; a lesson about a warning shows it in a labelled fence.
 
+**The one library so far is ICU**, for [the ICU4C lesson](03_Strings/unicode_text_with_icu4c/README.md). An example that needs a library puts its build command in its opening comment — `Build: cc ... $(pkg-config --cflags --libs icu-uc icu-i18n) ...` — and `tools/run_examples.py` asks `pkg-config` the same question, so the command a reader copies is the one CI ran. Homebrew installs ICU keg-only, out of `pkg-config`'s sight; the tool looks in the keg when `PKG_CONFIG_PATH` does not already name it (`BREW_KEG_ONLY`). CI installs `libicu-dev` on Ubuntu and `icu4c` on macOS — a second library needs a line in both places.
+
 **Shell: `bash`, from the example's folder, under `LC_ALL=C`.** Most scripts here drive `cc` and `make` over a scratch copy of the lesson's `demo/`. Print each command before running it — the `say` helper in the existing scripts does that — so a verified block reads like a terminal.
 
 **Deterministic, on both machines.** No clocks, timings, random numbers or addresses (`%p` changes from run to run). No value the ABI chooses — `sizeof(long)`, whether a plain `char` is signed. And no message a tool words differently on the two machines: ask for an exit status instead (`make -q`), and put the message in a labelled fence.
@@ -77,8 +79,11 @@ CI runs every example on `ubuntu-latest` and `macos-latest`. Measured difference
 | `-static` | links | `ld: library 'crt0.o' not found` |
 | `-Wconversion` in C++ | leaves out `-Wsign-conversion` | includes it |
 | `nm` on `int counter;` at file scope | `B counter`, in `.bss` | `S counter`, in `__DATA,__common` — with or without `-fno-common` |
+| ICU | 74.2, from `libicu-dev` | 78, from Homebrew's `icu4c` (keg-only) |
+| `pkg-config --libs icu-uc icu-i18n` | `-licui18n -licuuc -licudata` | `-L<keg>/lib -licui18n -licuuc` |
+| a link missing ICU's libraries | `` undefined reference to `ucasemap_open_74' `` | `"_ucasemap_open_78", referenced from:` |
 
-Measured 2026-09-11; the `nm` row on 2026-09-13. The Linux column in Docker — `ubuntu:24.04` with `make`, `gcc` and `g++` from apt, and Debian's `gcc:14` image (GNU Make 4.4.1, GCC 14), which agreed on every row either was asked; `-static` and `-Wconversion` were measured in `gcc:14`. The macOS column on an x86-64 Mac (macOS 26, Apple clang 21); the runner is arm64, so a row that turns out to depend on the CPU gets a note when CI finds it.
+Measured 2026-09-11; the `nm` and ICU rows on 2026-09-13 (ICU in `ubuntu:24.04` with `libicu-dev`, and with Homebrew's `icu4c@78` 78.3). The Linux column in Docker — `ubuntu:24.04` with `make`, `gcc` and `g++` from apt, and Debian's `gcc:14` image (GNU Make 4.4.1, GCC 14), which agreed on every row either was asked; `-static` and `-Wconversion` were measured in `gcc:14`. The macOS column on an x86-64 Mac (macOS 26, Apple clang 21); the runner is arm64, so a row that turns out to depend on the CPU gets a note when CI finds it.
 
 ## Bridges
 
