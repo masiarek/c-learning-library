@@ -1,0 +1,5 @@
+"hello".len() = 5 -- the length is stored, no terminator
+"ab\0cd".len() = 5, find('\0') = Some(2)
+CString::new("hello") -> 6 bytes with the NUL: [104, 101, 108, 108, 111, 0]
+CString::new("ab\0cd") -> Err: nul byte found in provided data at position: 2
+c"hello": count_bytes() = 5, to_bytes_with_nul().len() = 6

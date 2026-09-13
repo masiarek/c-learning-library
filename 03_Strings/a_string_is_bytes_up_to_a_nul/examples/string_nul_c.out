@@ -1,0 +1,13 @@
+char word[] = "hello"
+  sizeof word = 6, strlen(word) = 5
+  bytes:                   68 65 6c 6c 6f 00
+char five[5] = "hello"
+  sizeof five = 5, and no strlen: there is no NUL to stop at
+  bytes:                   68 65 6c 6c 6f
+char cut[] = "ab\0cd"
+  sizeof cut = 6, strlen(cut) = 2, printf("%s") prints "ab"
+  bytes:                   61 62 00 63 64 00
+  memcmp sees all six: memcmp(cut, "ab\0cd", 6) == 0 is true
+const char *tail = word + 2
+  tail = "llo", strlen(tail) = 3
+inside a function, sizeof s == sizeof (const char *): true

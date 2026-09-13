@@ -1,0 +1,6 @@
+1000 as text "1000": 4 bytes
+  bytes:                     31 30 30 30
+1000 as a big-endian int32: 4 bytes
+  bytes:                     00 00 03 e8
+  a NUL (00) is in there: yes -- so this is not text
+'\n' is one byte: 0a   "\r\n" is two:                              0d 0a

@@ -1,0 +1,14 @@
+input        atoi     sscanf %d          strtol, checked
+"42"         42       1 item, 42         42
+" 42"        42       1 item, 42         42
+"42 "        42       1 item, 42         error: trailing characters
+"42abc"      42       1 item, 42         error: trailing characters
+""           0        -1 items           error: no digits
+"abc"        0        0 items            error: no digits
+"-7"         -7       1 item, -7         -7
+"+7"         7        1 item, 7          7
+"0x1A"       0        1 item, 0          error: trailing characters
+
+strtol("99999999999999999999999", checked) -> error: out of range
+strtol("0x1A", base 0) = 26, strtol("012", base 0) = 10, base 10 = 12
+sscanf("Zbigniew", "%5s") -> 1 item, name = "Zbign"

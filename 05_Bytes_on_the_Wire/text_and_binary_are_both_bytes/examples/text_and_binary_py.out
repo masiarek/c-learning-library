@@ -1,0 +1,6 @@
+1000 as text: b'1000'  (4 bytes)
+1000 as int32 big-endian: b'\x00\x00\x03\xe8'  (4 bytes)
+a NUL byte in the integer form: True
+open(..., "w").write("1000") stored the str '1000'
+open(..., "wb").write(int) stored the bytes b'\x00\x00\x03\xe8'
+newline '\n' is b'\n'; Windows '\r\n' is '\r\n' = b'\r\n'

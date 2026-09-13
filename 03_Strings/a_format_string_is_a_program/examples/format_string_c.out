@@ -1,0 +1,6 @@
+printf("%s\n", text) prints: 100%% done
+printf(text) prints:           100% done
+hello
+%n stored 5
+[    42] [42    ] [abc]
+snprintf(NULL, 0, ...) says the text needs 18 bytes

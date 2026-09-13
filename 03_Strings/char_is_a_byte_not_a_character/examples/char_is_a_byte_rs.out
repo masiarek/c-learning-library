@@ -1,0 +1,9 @@
+"café": len() = 5 bytes, chars().count() = 4
+bytes: [63, 61, 66, c3, a9]
+to_uppercase() = "CAFÉ"
+to_ascii_uppercase() = "CAFé"  -- the C answer, by name
+is_char_boundary(4) = false
+s.get(..4) = None, s.get(..3) = Some("caf")
+from_utf8(first 4 bytes) = Err: valid_up_to 3, error_len None
+chars().rev() = "éfac"
+bytes reversed: ��fac

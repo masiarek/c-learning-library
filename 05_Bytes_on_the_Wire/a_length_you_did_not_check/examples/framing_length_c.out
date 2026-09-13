@@ -1,0 +1,5 @@
+length 5, 5 present:     accepted: 5-byte payload "hello"
+hostile frame claims 60000 bytes; 2 arrived
+  a trusting memcpy would read 60000 bytes from a 4-byte buffer
+claims 60000, 2 present: rejected: claimed length exceeds our buffer
+length 8, 3 present:     rejected: claimed length runs past the bytes we have

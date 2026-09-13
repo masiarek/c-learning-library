@@ -1,0 +1,12 @@
+strncpy(buf, "hello world", 6)
+  bytes:                       68 65 6c 6c 6f 20
+  a NUL among them: no
+strncpy(buf, "hi", 6)
+  bytes:                       68 69 00 00 00 00
+snprintf(buf, 6, "%s", "hello world")
+  bytes:                       68 65 6c 6c 6f 00
+  returned 11, buffer holds "hello"; truncated: yes
+strlcpy(buf, 6, "hello world")
+  bytes:                       68 65 6c 6c 6f 00
+  returned 11, buffer holds "hello"; truncated: yes
+memcpy of min(strlen, 5) bytes, then a NUL: "hello"

@@ -1,0 +1,5 @@
+struct.pack('>BIH', 7, 0x01020304, 1000) = 07 01 02 03 04 03 e8  (7 bytes)
+struct.calcsize('>BIH') = 7  -- packed, no padding
+struct.calcsize('@BIH') = 10  -- native, with padding
+struct.unpack('>BIH', ...) = (7, 16909060, 1000)
+round trip ok: True

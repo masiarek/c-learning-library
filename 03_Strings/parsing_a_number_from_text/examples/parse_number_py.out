@@ -1,0 +1,13 @@
+int('42'                        ) = 42
+int(' 42'                       ) = 42
+int('42 '                       ) = 42
+int('42abc'                     ) -> ValueError: invalid literal for int() with base 10: '42abc'
+int(''                          ) -> ValueError: invalid literal for int() with base 10: ''
+int('abc'                       ) -> ValueError: invalid literal for int() with base 10: 'abc'
+int('-7'                        ) = -7
+int('+7'                        ) = 7
+int('0x1A'                      ) -> ValueError: invalid literal for int() with base 10: '0x1A'
+int('99999999999999999999999'   ) = 99999999999999999999999
+int('1_000'                     ) = 1000
+int('0x1A', 0) = 26, int('012', 0) -> ValueError: invalid literal for int() with base 0: '012'
+int('0o12', 0) = 10

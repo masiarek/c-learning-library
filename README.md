@@ -28,7 +28,9 @@ So every answer key here is something **both** machines print. What they disagre
 |---|---|
 | [01_Building](01_Building/README.md) | What turns `.c` files into a program — and what decides which of them to compile again? |
 | [02_Decompiling](02_Decompiling/README.md) | What does a compiled program still say about the C it came from — and what has to be told to it? |
+| [03_Strings](03_Strings/README.md) | Where does a C string end, why is an accented letter more than one `char`, and why is `printf(user_text)` a security hole? |
 | [04_Debugging](04_Debugging/README.md) | What does a running program have that the file does not — and what does Ghidra keep of it? |
+| [05_Bytes_on_the_Wire](05_Bytes_on_the_Wire/README.md) | When bytes leave the program, which are text and which binary, which byte comes first, and why must a length off the wire be doubted? |
 
 More are planned; [00_Start_Here](00_Start_Here/README.md) has the list.
 

@@ -1,0 +1,4 @@
+fields add up to 7 bytes, but sizeof(struct order) = 12
+the gaps: offsetof type=0 id=4 qty=8
+on the wire (7 bytes):           07 01 02 03 04 03 e8
+read back: type=7 id=0x01020304 qty=1000, round trip ok: yes

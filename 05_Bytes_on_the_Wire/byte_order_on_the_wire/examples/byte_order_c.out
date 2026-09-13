@@ -1,0 +1,4 @@
+0x01020304 big-endian (shifts):    01 02 03 04
+0x01020304 little-endian (shifts): 04 03 02 01
+htonl(0x01020304), as bytes:       01 02 03 04
+read back from big-endian bytes: 0x01020304, round trip ok: yes

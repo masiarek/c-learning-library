@@ -1,0 +1,13 @@
+$ cc -std=c17 -Wall -Wextra -pedantic -o read_line read_line.c
+$ printf 'hi\n' | ./read_line
+fgets: 3 byte(s) "hi" -- line complete
+$ printf 'hello world\n' | ./read_line
+fgets: 7 byte(s) "hello w" -- buffer full, line continues
+fgets: 5 byte(s) "orld" -- line complete
+$ printf 'no newline at all' | ./read_line
+fgets: 7 byte(s) "no newl" -- buffer full, line continues
+fgets: 7 byte(s) "ine at " -- buffer full, line continues
+fgets: 3 byte(s) "all" -- buffer full, line continues
+$ printf 'ab\ncd\n' | ./read_line
+fgets: 3 byte(s) "ab" -- line complete
+fgets: 3 byte(s) "cd" -- line complete

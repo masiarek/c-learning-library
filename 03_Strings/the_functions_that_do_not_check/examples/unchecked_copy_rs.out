@@ -1,0 +1,3 @@
+copied 5 of 11 bytes: "hello"
+buf.copy_from_slice(11 bytes into 6): panicked -- nothing was written
+push_str: len 11 capacity true

@@ -1,0 +1,5 @@
+len("hello") = 5 -- no sixth byte, the length is stored
+len("ab\0cd") = 5, and "ab\0cd".find("\0") = 2
+"ab\0cd".encode() = b'ab\x00cd' -- six bytes, the NUL among them
+ctypes.c_char_p(...).value = b'ab'
+open('ab\0cd') -> ValueError: embedded null byte

@@ -75,7 +75,9 @@ NAV_ORDER: dict[str, list[str]] = {
         "00_Start_Here",
         "01_Building",
         "02_Decompiling",
+        "03_Strings",
         "04_Debugging",
+        "05_Bytes_on_the_Wire",
     ],
     # The graph you write by hand first; then a real one that writes its own rules.
     "01_Building": [
@@ -89,9 +91,28 @@ NAV_ORDER: dict[str, list[str]] = {
         "what_the_decompiler_recovers",
         "function_start_patterns",
     ],
+    # The string, taken apart: the terminator, then the byte that is not a
+    # letter, then the functions with no length, reading a number, the format.
+    "03_Strings": [
+        "README.md",
+        "a_string_is_bytes_up_to_a_nul",
+        "char_is_a_byte_not_a_character",
+        "the_functions_that_do_not_check",
+        "parsing_a_number_from_text",
+        "a_format_string_is_a_program",
+    ],
     "04_Debugging": [
         "README.md",
         "what_the_debugger_records",
+    ],
+    # What bytes are, then their order, then a whole record, then trusting a
+    # length off the wire.
+    "05_Bytes_on_the_Wire": [
+        "README.md",
+        "text_and_binary_are_both_bytes",
+        "byte_order_on_the_wire",
+        "a_record_on_the_wire",
+        "a_length_you_did_not_check",
     ],
 }
 

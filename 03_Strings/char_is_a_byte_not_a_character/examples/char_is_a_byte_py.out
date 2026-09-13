@@ -1,0 +1,8 @@
+str 'café': len 4, s[3] = 'é'
+bytes b'caf\xc3\xa9': len 5, b[3] = 195
+s.upper() = 'CAFÉ'
+b.upper() = b'CAF\xc3\xa9'  -- ASCII only, like C's toupper
+b[:4] = b'caf\xc3'
+  .decode() -> UnicodeDecodeError: unexpected end of data at byte 3
+s[::-1] = 'éfac'
+b[::-1] = b'\xa9\xc3fac'  -> decode(errors='replace') = '��fac'

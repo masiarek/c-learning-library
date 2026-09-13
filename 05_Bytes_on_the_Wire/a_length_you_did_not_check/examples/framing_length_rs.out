@@ -1,0 +1,3 @@
+length 5, 5 present      accepted: "hello"
+claims 60000, 2 present  rejected: claimed length exceeds our ceiling
+length 8, 3 present      rejected: claimed length runs past the bytes we have

@@ -1,0 +1,6 @@
+"cafe-with-accent": strlen = 5 bytes, a reader counts 4 letters
+bytes:             63 61 66 c3 a9
+toupper each byte: 43 41 46 c3 a9
+first 4 bytes:     63 61 66 c3   (ends inside the accent; C does not notice)
+a char is 8 bits; whether plain char is signed is implementation-defined
+byte 0xc3 asked through unsigned char: isalpha = 0, isprint = 0

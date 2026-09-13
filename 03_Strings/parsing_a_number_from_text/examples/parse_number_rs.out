@@ -1,0 +1,13 @@
+"42"                         parse::<i32>() = Ok(42)
+" 42"                        parse::<i32>() = Err: invalid digit found in string
+"42 "                        parse::<i32>() = Err: invalid digit found in string
+"42abc"                      parse::<i32>() = Err: invalid digit found in string
+""                           parse::<i32>() = Err: cannot parse integer from empty string
+"abc"                        parse::<i32>() = Err: invalid digit found in string
+"-7"                         parse::<i32>() = Ok(-7)
+"+7"                         parse::<i32>() = Ok(7)
+"0x1A"                       parse::<i32>() = Err: invalid digit found in string
+"99999999999999999999999"    parse::<i32>() = Err: number too large to fit in target type
+" 42 ".trim().parse::<i32>() = Ok(42)
+i32::from_str_radix("1A", 16) = Ok(26)
+"99999999999999999999999".parse::<u128>() = Ok(99999999999999999999999)

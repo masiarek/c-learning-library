@@ -1,0 +1,16 @@
+$ cc -std=c17 -Wall -Wextra -Werror=format-security -o greet greet.c
+exit 1
+$ cc -std=c17 -Wall -Wextra -Werror=format-security -o greet_fixed greet_fixed.c
+exit 0
+$ cc -std=c17 -Wall -Wextra -Werror=format -o wrong_type wrong_type.c
+exit 1
+$ cc -std=c17 -o greet greet.c
+exit 0
+$ ./greet hello
+hello
+$ ./greet_fixed hello
+hello
+$ ./greet '100%% done'
+100% done
+$ ./greet_fixed '100%% done'
+100%% done

@@ -32,13 +32,14 @@ The first command prints what the page's verified block shows. The last one chec
 |---|---|
 | [01_Building](../01_Building/README.md) | The compiler, the linker and `make` — what turns `.c` files into a program, and what decides which of them to rebuild |
 | [02_Decompiling](../02_Decompiling/README.md) | Ghidra's decompiler on a program you built — what it hands back, what was never in the file, and how to tell it |
+| [03_Strings](../03_Strings/README.md) | The C string: a length nobody wrote down, and the classic bugs that follow — the terminator, the byte that is not a letter, the functions with no length, and the format string that turns out to be a program |
 | [04_Debugging](../04_Debugging/README.md) | lldb and gdb on a program you built, and what Ghidra's Debugger records of what they report |
+| [05_Bytes_on_the_Wire](../05_Bytes_on_the_Wire/README.md) | Sending data out of the program: text versus binary, byte order, a record without its padding, and a length off the wire you must not trust |
 
 ## Planned
 
 Rough order, not a promise:
 
 - **Integers** — widths, promotions, signed overflow, and `<stdint.h>`
-- **Strings are arrays** — the terminating NUL, `strlen` against `sizeof`, and the library functions that do not check a length
 - **Pointers and memory** — `malloc` and `free`, lifetimes, and what AddressSanitizer catches
 - **Undefined behaviour** — what the standard declines to define, and why the optimizer cares. The Rust library's [C and C++ chapter ↗](https://masiarek.github.io/rust-learning-library/31_C_and_Cpp/index.html) already runs nine of them

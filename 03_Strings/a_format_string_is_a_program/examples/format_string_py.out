@@ -1,0 +1,5 @@
+'Hello, {0.name}!'                           -> 'Hello, Ada!'
+'{0.__class__.__name__}'                     -> 'Greeting'
+'{0.__init__.__globals__[API_KEY]}'          -> 'hunter2'
+'%(api_key)s'                                -> 'hunter2'
+$name                                        -> 'Ada'
