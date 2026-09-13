@@ -31,6 +31,7 @@ The first command prints what the page's verified block shows. The last one chec
 | Chapter | What it covers |
 |---|---|
 | [01_Building](../01_Building/README.md) | The compiler, the linker and `make` — what turns `.c` files into a program, and what decides which of them to rebuild |
+| [02_Decompiling](../02_Decompiling/README.md) | Ghidra's decompiler on a program you built — what it hands back, what was never in the file, and how to tell it |
 
 ## Planned
 

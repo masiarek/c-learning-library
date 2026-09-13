@@ -1,0 +1,20 @@
+$ cc -std=c17 -Wall -Wextra -O2 -o shapes shapes.c
+$ ./shapes
+weighted(4, 6) = 9
+sum_to(10) = 55
+norm2({3, 4}) = 25
+decompiler has 10 letters
+$ names shapes
+main norm2 shout sum_to weighted 
+$ grep -c -a 'has %zu letters' shapes
+1
+$ grep -c -a -w -E 'point|word|total' shapes
+0
+$ strip shapes
+$ names shapes
+
+$ ./shapes
+weighted(4, 6) = 9
+sum_to(10) = 55
+norm2({3, 4}) = 25
+decompiler has 10 letters

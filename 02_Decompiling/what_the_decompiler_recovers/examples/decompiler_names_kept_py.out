@@ -1,0 +1,3 @@
+sum_to(10)  = 55
+co_varnames = ('n', 'total', 'i')
+co_names    = ('range',)

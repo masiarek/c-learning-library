@@ -1,0 +1,14 @@
+$ cc -std=c17 -Wall -Wextra -O0 -o shapes0 shapes.c
+$ cc -std=c17 -Wall -Wextra -O2 -o shapes2 shapes.c
+$ cmp -s shapes0 shapes2
+exit 1
+$ ./shapes0
+weighted(4, 6) = 9
+sum_to(10) = 55
+norm2({3, 4}) = 25
+decompiler has 10 letters
+$ ./shapes2
+weighted(4, 6) = 9
+sum_to(10) = 55
+norm2({3, 4}) = 25
+decompiler has 10 letters

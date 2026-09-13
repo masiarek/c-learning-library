@@ -74,12 +74,17 @@ NAV_ORDER: dict[str, list[str]] = {
         "index.md",
         "00_Start_Here",
         "01_Building",
+        "02_Decompiling",
     ],
     # The graph you write by hand first; then a real one that writes its own rules.
     "01_Building": [
         "README.md",
         "makefiles",
         "reading_a_real_makefile",
+    ],
+    "02_Decompiling": [
+        "README.md",
+        "what_the_decompiler_recovers",
     ],
 }
 
