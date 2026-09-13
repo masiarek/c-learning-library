@@ -42,6 +42,7 @@ A C compiler and `make`. On a Mac: `xcode-select --install`. On Debian or Ubuntu
 
 - [rust-learning-library ↗](https://masiarek.github.io/rust-learning-library/) — its [C and C++ chapter ↗](https://masiarek.github.io/rust-learning-library/31_C_and_Cpp/index.html) runs nine classic C bugs and shows the Rust that refuses to compile each one.
 - [encodings-learning-library ↗](https://masiarek.github.io/encodings-learning-library/) — bytes, characters and UTF-8, with a C view on several pages.
+- [ruby-text-learning-library ↗](https://masiarek.github.io/ruby-text-learning-library/) — strings that carry their own encoding; its `pack`, `to_i` and `String.new` lessons link back to Bytes on the Wire and Strings here.
 - [CONTRIBUTING.md](CONTRIBUTING.md) — house rules, for whoever is about to write a page.
 
 <!-- --8<-- [end:below-hero] -->
