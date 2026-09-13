@@ -206,3 +206,4 @@ bytes reversed: ��fac
 - [C or Rust for text ↗](https://masiarek.github.io/encodings-learning-library/10_Best_Practices/c_or_rust_for_text/index.html) — `char` as one type that is not a text type, measured against Rust's two
 - [Meet the `char` ↗](https://masiarek.github.io/rust-learning-library/14_Strings/meet_the_char/index.html) — Rust's `char`, which is a 32-bit scalar value and genuinely one character
 - [Counting characters ↗](https://masiarek.github.io/python-learning-library/01_Text_and_Bytes/counting_characters/index.html) — the four answers to "how long is this string", one of which is C's
+- [`use utf8` is about the source file ↗](https://masiarek.github.io/perl-learning-library/02_Unicode_Text/use_utf8_is_about_the_source/index.html) — Perl without `use utf8` counts like C: `length` counts the literal's bytes, and `lc` corrupts them

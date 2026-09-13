@@ -226,3 +226,4 @@ i32::from_str_radix("1A", 16) = Ok(26)
 - [A record on the wire](../../05_Bytes_on_the_Wire/a_record_on_the_wire/README.md) — parsing a *binary* number rather than a text one, where the failure modes are byte order and width instead of stray characters
 - [Parsing a string ↗](https://masiarek.github.io/rust-learning-library/14_Strings/parsing_a_string/index.html) — `parse` and the `FromStr` trait in full
 - [Encode, decode and errors ↗](https://masiarek.github.io/python-learning-library/01_Text_and_Bytes/encode_and_decode/index.html) — the same "what do you do when the bytes are wrong" question, one layer down
+- [Numbers from text ↗](https://masiarek.github.io/perl-learning-library/04_Records_and_Fields/numbers_from_text/index.html) — Perl's `+ 0`, which behaves like `atoi`: it reads `42abc` as 42, warns, and carries on

@@ -753,3 +753,4 @@ A `str` is already code points, so there is no conversion step and no status to 
 - [Case is not a per-character operation ↗](https://masiarek.github.io/encodings-learning-library/02_Characters/case_is_not_per_character/index.html) — why step 3 needs whole strings
 - [Normalization ↗](https://masiarek.github.io/python-learning-library/01_Text_and_Bytes/normalization/index.html) — step 4 in Python, with the four forms side by side
 - [ICU User Guide ↗](https://unicode-org.github.io/icu/userguide/) and [ICU4C API reference ↗](https://unicode-org.github.io/icu-docs/apidoc/released/icu4c/) — the project's own documentation
+- [`sort` is not alphabetical ↗](https://masiarek.github.io/perl-learning-library/04_Records_and_Fields/sort_is_not_alphabetical/index.html) — per-language collation from Perl's core `Unicode::Collate::Locale`, the job ICU does here
