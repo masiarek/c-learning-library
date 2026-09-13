@@ -1,0 +1,6 @@
+merged:  0x55 0x48 0x89 0xe5 0x48 0x83 0xec 0...0000
+61 of 64 bits fixed
+match     sub rsp, 0x20 -- a frame none of the four had
+no match  sub rsp, 0x28 -- not a multiple of 16
+no match  twice, which sets up no frame at all
+no match  the first eight bytes of "nobody calls this"

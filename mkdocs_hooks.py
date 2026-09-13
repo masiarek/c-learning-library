@@ -83,9 +83,11 @@ NAV_ORDER: dict[str, list[str]] = {
         "makefiles",
         "reading_a_real_makefile",
     ],
+    # What the decompiler hands back first; then how Ghidra knew where to start.
     "02_Decompiling": [
         "README.md",
         "what_the_decompiler_recovers",
+        "function_start_patterns",
     ],
     "04_Debugging": [
         "README.md",

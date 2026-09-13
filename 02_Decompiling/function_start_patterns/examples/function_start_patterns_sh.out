@@ -1,0 +1,22 @@
+$ cc -std=c17 -Wall -Wextra -O0 -o prologues prologues.c
+$ ./prologues
+twice(21) = 42
+clamp(15, 0, 10) = 10
+sum({1, 2, 3, 4}) = 10
+greet_len("world") = 12
+prologue
+$ names prologues
+clamp greet_len main orphan say sum twice 
+$ grep -c -a 'nobody calls this' prologues
+1
+$ strip prologues
+$ names prologues
+
+$ grep -c -a 'nobody calls this' prologues
+1
+$ ./prologues
+twice(21) = 42
+clamp(15, 0, 10) = 10
+sum({1, 2, 3, 4}) = 10
+greet_len("world") = 12
+prologue

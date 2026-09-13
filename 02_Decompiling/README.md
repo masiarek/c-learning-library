@@ -5,6 +5,7 @@
 | Lesson | Level | What it teaches |
 |---|---|---|
 | [What the decompiler recovers](what_the_decompiler_recovers/README.md) | 201 | Four small functions through Ghidra's headless decompiler: an expression rebuilt from six instructions, a struct that comes back as `param_1[1]` until you declare it, and a loop that comes back as a formula because the optimizer got there first |
+| [Where a function starts](function_start_patterns/README.md) | 301 | How Ghidra finds functions in a stripped file: the four bytes clang puts at the start of every one, the Function Bit Patterns Explorer that discovers such bytes and turns them into a pattern file, and the two tables — one per executable format — that make the search unnecessary until a linker flag removes them |
 
 ## Planned
 
