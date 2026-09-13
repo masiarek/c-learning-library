@@ -92,7 +92,7 @@ Every lesson ends with *If you are coming from another language*: Rust (link the
 
 ## Nav order
 
-A new lesson folder gets a row in `NAV_ORDER` in [`mkdocs_hooks.py` ↗](https://github.com/masiarek/c-learning-library/blob/master/mkdocs_hooks.py), and an entry in `LABEL_OVERRIDES` if MkDocs would title-case its name wrongly. `tools/check_nav_chain.py` fails on a row naming a folder that does not exist, so commit the folder and its row together.
+A new lesson folder gets a row in `NAV_ORDER` in [`mkdocs_hooks.py` ↗](https://github.com/masiarek/c-learning-library/blob/master/mkdocs_hooks.py). Its sidebar label is its README's `# H1` with the backticks dropped; give it an entry in `LABEL_OVERRIDES` only when that H1 is too long for a sidebar. `tools/check_nav_chain.py` fails on a row naming a folder that does not exist, so commit the folder and its row together.
 
 ## Stubs
 
