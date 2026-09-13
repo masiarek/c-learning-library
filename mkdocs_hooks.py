@@ -75,6 +75,7 @@ NAV_ORDER: dict[str, list[str]] = {
         "00_Start_Here",
         "01_Building",
         "02_Decompiling",
+        "04_Debugging",
     ],
     # The graph you write by hand first; then a real one that writes its own rules.
     "01_Building": [
@@ -85,6 +86,10 @@ NAV_ORDER: dict[str, list[str]] = {
     "02_Decompiling": [
         "README.md",
         "what_the_decompiler_recovers",
+    ],
+    "04_Debugging": [
+        "README.md",
+        "what_the_debugger_records",
     ],
 }
 

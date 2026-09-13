@@ -1,0 +1,5 @@
+table[1]=21 local=7 heap=10 counter=3
+snapshot 1: counter was 0 when bump was called with by=1
+snapshot 2: counter was 1 when bump was called with by=2
+snapshot 3: counter was 2 when bump was called with by=3
+rewound to snapshot 1: counter was 0 and is now 3

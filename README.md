@@ -28,12 +28,13 @@ So every answer key here is something **both** machines print. What they disagre
 |---|---|
 | [01_Building](01_Building/README.md) | What turns `.c` files into a program — and what decides which of them to compile again? |
 | [02_Decompiling](02_Decompiling/README.md) | What does a compiled program still say about the C it came from — and what has to be told to it? |
+| [04_Debugging](04_Debugging/README.md) | What does a running program have that the file does not — and what does Ghidra keep of it? |
 
 More are planned; [00_Start_Here](00_Start_Here/README.md) has the list.
 
 ## What you need
 
-A C compiler and `make`. On a Mac: `xcode-select --install`. On Debian or Ubuntu: `sudo apt install build-essential`. Nothing else — no libraries, no package manager, no IDE. The [Decompiling](02_Decompiling/README.md) chapter also drives Ghidra — `brew install ghidra` on a Mac — but every Ghidra result is on the page, so you need it only to reproduce them.
+A C compiler and `make`. On a Mac: `xcode-select --install`. On Debian or Ubuntu: `sudo apt install build-essential`. Nothing else — no libraries, no package manager, no IDE. The [Decompiling](02_Decompiling/README.md) chapter also drives Ghidra — `brew install ghidra` on a Mac — but every Ghidra result is on the page, so you need it only to reproduce them. The [Debugging](04_Debugging/README.md) chapter's transcripts come from `lldb`, which the Command Line Tools include, and from `gdb` in an Ubuntu container.
 
 ## See also
 

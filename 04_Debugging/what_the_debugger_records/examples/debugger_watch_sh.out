@@ -1,0 +1,13 @@
+$ cc -std=c17 -Wall -Wextra -O0 -g -fno-common -o watch watch.c
+$ ./watch
+table[1]=21 local=7 *heap=10 counter=3
+$ kinds watch
+code       bump
+zero-fill  counter
+code       main
+data       table
+$ cc -std=c17 -Wall -Wextra -O0 -o plain plain.c
+$ cc -std=c17 -Wall -Wextra -O0 -o bss bss.c
+$ cc -std=c17 -Wall -Wextra -O0 -o data data.c
+bss:  a 400000-byte array added under 4096 bytes to the file
+data: the same array, initialized, added at least 400000 bytes

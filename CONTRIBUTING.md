@@ -76,8 +76,9 @@ CI runs every example on `ubuntu-latest` and `macos-latest`. Measured difference
 | `CXX` if unset | `g++` | `c++` |
 | `-static` | links | `ld: library 'crt0.o' not found` |
 | `-Wconversion` in C++ | leaves out `-Wsign-conversion` | includes it |
+| `nm` on `int counter;` at file scope | `B counter`, in `.bss` | `S counter`, in `__DATA,__common` — with or without `-fno-common` |
 
-Measured 2026-09-11. The Linux column in Docker — `ubuntu:24.04` with `make`, `gcc` and `g++` from apt, and Debian's `gcc:14` image (GNU Make 4.4.1, GCC 14), which agreed on every row either was asked; `-static` and `-Wconversion` were measured in `gcc:14`. The macOS column on an x86-64 Mac (macOS 26, Apple clang 21); the runner is arm64, so a row that turns out to depend on the CPU gets a note when CI finds it.
+Measured 2026-09-11; the `nm` row on 2026-09-13. The Linux column in Docker — `ubuntu:24.04` with `make`, `gcc` and `g++` from apt, and Debian's `gcc:14` image (GNU Make 4.4.1, GCC 14), which agreed on every row either was asked; `-static` and `-Wconversion` were measured in `gcc:14`. The macOS column on an x86-64 Mac (macOS 26, Apple clang 21); the runner is arm64, so a row that turns out to depend on the CPU gets a note when CI finds it.
 
 ## Bridges
 
