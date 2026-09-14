@@ -101,6 +101,7 @@ NAV_ORDER: dict[str, list[str]] = {
         "the_functions_that_do_not_check",
         "parsing_a_number_from_text",
         "a_format_string_is_a_program",
+        "teaching_printf_a_new_conversion",
         "unicode_text_with_icu4c",
     ],
     "04_Debugging": [

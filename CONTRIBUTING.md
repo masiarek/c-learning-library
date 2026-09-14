@@ -82,8 +82,11 @@ CI runs every example on `ubuntu-latest` and `macos-latest`. Measured difference
 | ICU | 74.2, from `libicu-dev` | 78, from Homebrew's `icu4c` (keg-only) |
 | `pkg-config --libs icu-uc icu-i18n` | `-licui18n -licuuc -licudata` | `-L<keg>/lib -licui18n -licuuc` |
 | a link missing ICU's libraries | `` undefined reference to `ucasemap_open_74' `` | `"_ucasemap_open_78", referenced from:` |
+| a new `printf` conversion | `register_printf_specifier` — every `printf` in the program sees it | `register_printf_domain_function` — only `xprintf` calls handed that domain do |
+| `-Wall` on `printf("%W", &c)` | `unknown conversion type character 'W' in format`, and `too many arguments for format` | `invalid conversion specifier 'W'` |
+| `man 'printf(3)'` | man-db 2.12 opens `printf(3)` | `No manual entry for printf(3)` |
 
-Measured 2026-09-11; the `nm` and ICU rows on 2026-09-13 (ICU in `ubuntu:24.04` with `libicu-dev`, and with Homebrew's `icu4c@78` 78.3). The Linux column in Docker — `ubuntu:24.04` with `make`, `gcc` and `g++` from apt, and Debian's `gcc:14` image (GNU Make 4.4.1, GCC 14), which agreed on every row either was asked; `-static` and `-Wconversion` were measured in `gcc:14`. The macOS column on an x86-64 Mac (macOS 26, Apple clang 21); the runner is arm64, so a row that turns out to depend on the CPU gets a note when CI finds it.
+Measured 2026-09-11; the `nm` and ICU rows on 2026-09-13 (ICU in `ubuntu:24.04` with `libicu-dev`, and with Homebrew's `icu4c@78` 78.3), and the `printf` and `man` rows the same day (GCC 13.3 in `ubuntu:24.04`, and man-db 2.12.0 in an `ubuntu:24.04` image with its man pages restored). The Linux column in Docker — `ubuntu:24.04` with `make`, `gcc` and `g++` from apt, and Debian's `gcc:14` image (GNU Make 4.4.1, GCC 14), which agreed on every row either was asked; `-static` and `-Wconversion` were measured in `gcc:14`. The macOS column on an x86-64 Mac (macOS 26, Apple clang 21); the runner is arm64, so a row that turns out to depend on the CPU gets a note when CI finds it.
 
 ## Bridges
 

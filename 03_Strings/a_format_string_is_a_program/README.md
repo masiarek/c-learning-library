@@ -215,6 +215,7 @@ A user-supplied `"{0.__init__.__globals__[API_KEY]}"` reaches a module global th
 
 ## See also
 
+- [Teaching `printf` a new conversion](../teaching_printf_a_new_conversion/README.md) — the directive language extended on purpose: a `%W` of your own, registered with glibc or with Apple's libc
 - [The functions that do not check](../the_functions_that_do_not_check/README.md) — `sprintf`'s other hazard, the one about length rather than directives
 - [A string is bytes up to a NUL](../a_string_is_bytes_up_to_a_nul/README.md) — why `%s` walking off a missing terminator is part of the same danger
 - [The byte that means something to somebody else ↗](https://masiarek.github.io/encodings-learning-library/12_Adversarial/in_band_signals/index.html) — the general pattern: data one layer reads as instructions

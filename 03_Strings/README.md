@@ -4,7 +4,7 @@
 
 Every other language in this library's family hands you a string that knows its own length and, usually, its own encoding. C hands you bytes and a convention: the string ends at the first `\0`, and everything else — how long it is, whether it is valid text, whether it fits — is found by looking, every time, by code you wrote. That single decision is why C is still the language at the edge of the machine, and why the same decision is behind decades of buffer overruns.
 
-This chapter is the string, taken apart. The bytes and the terminator first, then the fact that a `char` is a byte and not a letter, then the library functions that were built without a length and the ones built to replace them, then reading a number back out of text, then the format string — the one piece of "data" that `printf` runs as code — and finally ICU4C, the library a C program reaches for once its text stops being ASCII.
+This chapter is the string, taken apart. The bytes and the terminator first, then the fact that a `char` is a byte and not a letter, then the library functions that were built without a length and the ones built to replace them, then reading a number back out of text, then the format string — the one piece of "data" that `printf` runs as code — and a directive of your own added to it, and finally ICU4C, the library a C program reaches for once its text stops being ASCII.
 
 | Lesson | Level | What it settles |
 |---|---|---|
@@ -13,6 +13,7 @@ This chapter is the string, taken apart. The bytes and the terminator first, the
 | [The functions that do not check](the_functions_that_do_not_check/README.md) | 201 → 301 | `strcpy`, `strcat` and `sprintf` take no length; what `strncpy`, `snprintf`, `strlcpy` and `fgets` do instead, and where each still bites |
 | [Parsing a number from text](parsing_a_number_from_text/README.md) | 201 | `atoi` cannot report failure, `sscanf` half can, and `strtol` tells you exactly where it stopped and why — deserialization in miniature |
 | [A format string is a program](a_format_string_is_a_program/README.md) | 301 | Why `printf(user_text)` is a security hole, what `%n` does, and the one compiler flag that turns the hole into a build error |
+| [Teaching `printf` a new conversion](teaching_printf_a_new_conversion/README.md) | 301 | How glibc and Apple's libc let a program add `%W` to the format language — program-wide on one, inside a *printf domain* on the other — and why `man xprintf(5)` fails in every shell while `man 5 xprintf` opens the page |
 | [ICU4C: Unicode text in C](unicode_text_with_icu4c/README.md) | 201 → 301 | A tutorial on the library that does what the lessons above show libc cannot — case in a language, normalization, character boundaries, sorting and code pages — and on the build flags, the status code and the UTF-16 it asks for in return |
 
 ## Where this connects
