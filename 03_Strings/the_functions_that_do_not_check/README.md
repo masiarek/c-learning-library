@@ -10,7 +10,7 @@ This is the family behind the phrase *buffer overflow*. The functions were not b
 
 `strcpy(dst, src)` copies bytes from `src` until it reaches a `\0`, into `dst`, and writes exactly as many bytes as `src` is long plus one. It never looks at how big `dst` is, because it was never told. `strcat` is the same, starting at `dst`'s existing terminator. `sprintf(buf, fmt, ...)` formats into `buf` with no idea how big `buf` is. And `gets(buf)` reads a line from input into `buf` with no limit at all — it was so impossible to use safely that C11 removed it from the language, though the compilers still let you call it with a warning.
 
-Running any of them past the end of a buffer is undefined behaviour, so this page does not do it — a program with no defined output has no answer key, and the [Rust library's buffer-overruns page ↗](https://masiarek.github.io/rust-learning-library/31_C_and_Cpp/buffer_overruns/index.html) is where the crash is shown, labelled as the undefined behaviour it is. What this page runs are the functions that were meant to replace the unchecked ones, so you can see exactly what each one does when the data does not fit.
+Running any of them past the end of a buffer is undefined behaviour, so this page does not do it — a program with no defined output has no answer key, and the Rust library is where that crash is shown, labelled as the undefined behaviour it is: [the write past the end ↗](https://masiarek.github.io/rust-learning-library/31_C_and_Cpp/buffer_overflow/index.html) that `strcpy` performs here, beside its quieter [read cousin ↗](https://masiarek.github.io/rust-learning-library/31_C_and_Cpp/buffer_overruns/index.html). What this page runs are the functions that were meant to replace the unchecked ones, so you can see exactly what each one does when the data does not fit.
 
 ## What replaced them, and what each still gets wrong
 
@@ -237,5 +237,6 @@ push_str: len 11 capacity true
 - [A format string is a program](../a_format_string_is_a_program/README.md) — `sprintf`'s other hazard, where the format itself is the attack
 - [A length you did not check](../../05_Bytes_on_the_Wire/a_length_you_did_not_check/README.md) — the same missing check one layer out, on a length that came off the wire
 - [The bugs Rust is a reply to ↗](https://masiarek.github.io/rust-learning-library/31_C_and_Cpp/index.html) — nine of these run as real programs, each beside the Rust that will not build it
-- [Buffer overruns ↗](https://masiarek.github.io/rust-learning-library/31_C_and_Cpp/buffer_overruns/index.html) — the overflow this page declines to run, shown and labelled as undefined behaviour
+- [Buffer overflow ↗](https://masiarek.github.io/rust-learning-library/31_C_and_Cpp/buffer_overflow/index.html) — the write this page declines to run: `strcpy` past the end, shown and labelled as the undefined behaviour it is
+- [Buffer overruns ↗](https://masiarek.github.io/rust-learning-library/31_C_and_Cpp/buffer_overruns/index.html) — its read cousin, an off-by-one that returns a wrong number instead of smashing the frame
 - [C or Rust for text ↗](https://masiarek.github.io/encodings-learning-library/10_Best_Practices/c_or_rust_for_text/index.html) — when the unchecked edge is the right tool, and when it is not
