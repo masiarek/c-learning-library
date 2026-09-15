@@ -44,6 +44,8 @@ A C compiler and `make`. On a Mac: `xcode-select --install`. On Debian or Ubuntu
 - [encodings-learning-library ↗](https://masiarek.github.io/encodings-learning-library/) — bytes, characters and UTF-8, with a C view on several pages.
 - [ruby-text-learning-library ↗](https://masiarek.github.io/ruby-text-learning-library/) — strings that carry their own encoding; its `pack`, `to_i` and `String.new` lessons link back to Bytes on the Wire and Strings here.
 - [perl-learning-library ↗](https://masiarek.github.io/perl-learning-library/) — Perl for text processing; its lessons on literals, numbers and collation link back to Strings here.
+- [concurrency-learning-library ↗](https://masiarek.github.io/concurrency-learning-library/) — one concurrency question per page in C, C++, Rust, Go, Java and Python; its C sections use POSIX threads, and its concept map names each primitive in every language.
+- [go-learning-library ↗](https://masiarek.github.io/go-learning-library/) — goroutines, channels, `select`, `sync` and `context`, one runnable page each.
 - [CONTRIBUTING.md](CONTRIBUTING.md) — house rules, for whoever is about to write a page.
 
 <!-- --8<-- [end:below-hero] -->
