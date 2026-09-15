@@ -1,0 +1,13 @@
+== top ==
+  _helper  assigned global
+  twice    assigned global referenced
+  orphan   assigned global
+  print    global referenced
+== _helper ==
+  x        parameter referenced
+== twice ==
+  x        parameter referenced
+  _helper  global referenced
+== orphan ==
+  x        parameter referenced
+  print    global referenced

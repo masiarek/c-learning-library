@@ -85,11 +85,13 @@ NAV_ORDER: dict[str, list[str]] = {
         "makefiles",
         "reading_a_real_makefile",
     ],
-    # What the decompiler hands back first; then how Ghidra knew where to start.
+    # What the decompiler hands back first; then how Ghidra knew where to start;
+    # then every name it holds, where each came from, and the query that lists them.
     "02_Decompiling": [
         "README.md",
         "what_the_decompiler_recovers",
         "function_start_patterns",
+        "what_the_symbol_table_lists",
     ],
     # The string, taken apart: the terminator, then the byte that is not a
     # letter, then the functions with no length, reading a number, the format;

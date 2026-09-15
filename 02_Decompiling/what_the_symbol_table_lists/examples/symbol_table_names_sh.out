@@ -1,0 +1,24 @@
+$ cc -std=c17 -Wall -Wextra -O0 -o symbols symbols.c
+$ ./symbols
+twice(21) = 42
+table[0](1) = 8
+symbols
+$ names symbols
+global: counter greeting main orphan table tail twice via_table
+local: helper
+$ imports symbols
+printf puts 
+$ grep -c -a objc_msgSend_rtp symbols
+0
+$ strip symbols
+$ names symbols
+global:
+local:
+$ imports symbols
+printf puts 
+$ grep -c -a 'nobody calls this' symbols
+1
+$ ./symbols
+twice(21) = 42
+table[0](1) = 8
+symbols

@@ -6,6 +6,7 @@
 |---|---|---|
 | [What the decompiler recovers](what_the_decompiler_recovers/README.md) | 201 | Four small functions through Ghidra's headless decompiler: an expression rebuilt from six instructions, a struct that comes back as `param_1[1]` until you declare it, and a loop that comes back as a formula because the optimizer got there first |
 | [Where a function starts](function_start_patterns/README.md) | 301 | How Ghidra finds functions in a stripped file: the four bytes clang puts at the start of every one, the Function Bit Patterns Explorer that discovers such bytes and turns them into a pattern file, and the two tables — one per executable format — that make the search unnecessary until a linker flag removes them |
+| [What the symbol table lists](what_the_symbol_table_lists/README.md) | 201 | Ghidra's Symbol Table on a program with one of each kind of name: where each name came from, why a default name such as `DAT_` is not stored anywhere, the query the Symbol Table Filter dialog builds — run through Ghidra's own filter class — and two advanced filters that do not do what their names say: *Unreferenced* finds no function in a real executable, and *Not In Memory* lets every function through |
 
 ## Planned
 
