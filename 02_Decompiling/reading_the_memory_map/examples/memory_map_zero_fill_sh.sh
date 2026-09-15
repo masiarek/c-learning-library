@@ -14,6 +14,11 @@ cd "$work" || exit 1
 
 say() { printf '$ %s\n' "$*"; eval "$*" 2>&1; }
 
+# A build that works prints nothing here; its warnings are left out. Apple's ld
+# on arm64 warns that it reduced __common's alignment for the 1 MiB array, and
+# the x86-64 Mac and GCC do not -- see CONTRIBUTING.md.
+build() { printf '$ %s\n' "$*"; eval "$*" 2>/dev/null || echo "exit $?"; }
+
 # Is the file bigger than scratch, which is 1 << 20 bytes?
 compare() {
     if [ "$(wc -c < "$1")" -gt 1048576 ]; then
@@ -23,11 +28,11 @@ compare() {
     fi
 }
 
-say cc -std=c17 -Wall -Wextra -O2 -o layout layout.c
+build cc -std=c17 -Wall -Wextra -O2 -o layout layout.c
 say ./layout
 say compare layout
 say "sed 's/^char scratch\[1 << 20\];/char scratch[1 << 20] = { 1 };/' layout.c > filled.c"
 say "grep '^char scratch' layout.c filled.c"
-say cc -std=c17 -Wall -Wextra -O2 -o filled filled.c
+build cc -std=c17 -Wall -Wextra -O2 -o filled filled.c
 say ./filled
 say compare filled
