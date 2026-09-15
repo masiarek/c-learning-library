@@ -92,6 +92,7 @@ NAV_ORDER: dict[str, list[str]] = {
         "what_the_decompiler_recovers",
         "function_start_patterns",
         "what_the_symbol_table_lists",
+        "reading_the_memory_map",
     ],
     # The string, taken apart: the terminator, then the byte that is not a
     # letter, then the functions with no length, reading a number, the format;

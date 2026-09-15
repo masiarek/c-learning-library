@@ -1,0 +1,20 @@
+$ cc -std=c17 -Wall -Wextra -O2 -o layout layout.c
+$ ./layout
+memory map
+limit = 42, over_limit(50) = 1
+scratch: 1048576 bytes, 0 of them nonzero
+remember(7) = 1
+$ compare layout
+layout is smaller than scratch
+$ sed 's/^char scratch\[1 << 20\];/char scratch[1 << 20] = { 1 };/' layout.c > filled.c
+$ grep '^char scratch' layout.c filled.c
+layout.c:char scratch[1 << 20];
+filled.c:char scratch[1 << 20] = { 1 };
+$ cc -std=c17 -Wall -Wextra -O2 -o filled filled.c
+$ ./filled
+memory map
+limit = 42, over_limit(50) = 1
+scratch: 1048576 bytes, 1 of them nonzero
+remember(7) = 1
+$ compare filled
+filled is bigger than scratch

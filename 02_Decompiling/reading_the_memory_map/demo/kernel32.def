@@ -1,0 +1,8 @@
+; The three kernel32.dll functions layout.c calls on Windows. llvm-dlltool turns
+; this into the import library the linker needs; -k drops the @N, which is how
+; 32-bit __stdcall names are decorated in an object file but not in the DLL.
+LIBRARY kernel32.dll
+EXPORTS
+GetStdHandle@4
+WriteFile@20
+ExitProcess@4

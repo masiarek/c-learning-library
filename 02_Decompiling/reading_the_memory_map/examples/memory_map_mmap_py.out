@@ -1,0 +1,3 @@
+anonymous map: 1048576 bytes, 0 nonzero
+file map: 4 bytes, limit = 42
+write refused: mmap can't modify a readonly memory map.

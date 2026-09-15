@@ -1,0 +1,410 @@
+# Reading the memory map
+
+**Level:** 201 · for anyone who has opened *Window → Memory Map* in Ghidra and wondered what each row is
+
+**One line:** Every row of Ghidra's Memory Map is a range of addresses and a record of where its bytes came from — the file, zeros the file never held, or nothing at all — with permissions the analysis believes: uncheck **W** on the block that holds `limit` and the decompiler writes `42`; and a section that is bigger in memory than in the file is one row in Ghidra 12.1.3, not the two in the help's own picture.
+
+## The picture in the help
+
+Ghidra's help page for the window, [Memory Map ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Base/src/main/help/help/topics/MemoryMapPlugin/Memory_Map.htm), opens with [a picture ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Base/src/main/help/help/topics/MemoryMapPlugin/images/MemoryMap.png) of a 32-bit Windows program. Transcribed, with the two columns the picture narrows to `...` given their names from the help's column list, **W** and **Initialized**:
+
+| Name | Start | End | Length | R | W | X | Overlayed Space | Initialized |
+|---|---|---|---|---|---|---|---|---|
+| Headers | 00400000 | 00400fff | 0x1000 | ✓ | | ✓ | | ✓ |
+| .text | 00401000 | 0040aef4 | 0x9ef5 | ✓ | | ✓ | | ✓ |
+| .rdata | 0040b000 | 0040dbdd | 0x2bde | ✓ | | | | ✓ |
+| .data | 0040e000 | 0040efff | 0x1000 | ✓ | ✓ | | | ✓ |
+| .data | 0040f000 | 00410d07 | 0x1d08 | ✓ | ✓ | | | |
+| .rsrc | 00411000 | 0041cedf | 0xbee0 | ✓ | | | | ✓ |
+| OV1 | OV1::0… | OV1::0… | 0x100 | ✓ | | | ram | ✓ |
+
+Three things in it need a program to explain: two rows called `.data`, the second with **Initialized** unchecked; an **X** on the file's headers; and `OV1`, whose addresses begin with its own name. This page builds a program of the same shape, loads it into Ghidra 12.1.3, and reads every column — and two of the three come out differently.
+
+## The program
+
+Three globals, one for each way a loader places bytes, and two functions that touch them — [`demo/layout.c`](demo/layout.c):
+
+```c
+/* Three globals, one for each way a loader places bytes, and two functions that
+   touch them -- the program this page builds for macOS, Linux and Windows and
+   then reads in Ghidra's Memory Map.
+
+   Everywhere but Windows: cc -std=c17 -Wall -Wextra -O2 -o layout layout.c
+   For Windows: demo/build_pe.sh, which needs no Windows and no C runtime. */
+
+/* Read-only: the bytes are in the file, and nothing may write them. */
+const char greeting[] = "memory map\n";
+
+/* Writable, with a value the file has to carry. */
+int limit = 42;
+
+/* Writable and all zeros: a mebibyte the program gets at load time and the file
+   does not hold. */
+char scratch[1 << 20];
+
+int over_limit(int n)
+{
+    return n > limit;
+}
+
+int remember(int n)
+{
+    scratch[n & 0xfffff] += 1;
+    return scratch[n & 0xfffff];
+}
+
+#ifdef _WIN32
+/* No C runtime in this build, so no printf and no main: the linker's /entry
+   names start, and kernel32.dll does the writing. */
+typedef void *HANDLE;
+__declspec(dllimport) HANDLE __stdcall GetStdHandle(unsigned long which);
+__declspec(dllimport) int __stdcall WriteFile(HANDLE file, const void *bytes, unsigned long count,
+                                              unsigned long *written, void *overlapped);
+__declspec(dllimport) void __stdcall ExitProcess(unsigned int code);
+
+void start(void)
+{
+    unsigned long written;
+    HANDLE out = GetStdHandle((unsigned long)-11);   /* STD_OUTPUT_HANDLE */
+    WriteFile(out, greeting, sizeof greeting - 1, &written, 0);
+    ExitProcess((unsigned int)(over_limit(50) + remember(7)));
+}
+#else
+#include <stdio.h>
+
+int main(void)
+{
+    int nonzero = 0;
+    for (unsigned long i = 0; i < sizeof scratch; i++) {
+        nonzero += scratch[i] != 0;
+    }
+    printf("%s", greeting);
+    printf("limit = %d, over_limit(50) = %d\n", limit, over_limit(50));
+    printf("scratch: %lu bytes, %d of them nonzero\n", (unsigned long)sizeof scratch, nonzero);
+    printf("remember(7) = %d\n", remember(7));
+    return 0;
+}
+#endif
+```
+
+| Global | What it is there to show |
+|---|---|
+| `greeting` | bytes that are in the file and may not be written |
+| `limit` | a writable value the file has to carry — and the value `over_limit` reads |
+| `scratch` | a mebibyte of zeros: memory the program has and the file does not |
+
+The Windows half has no C runtime, so it has no `printf` and no `main`: `start` calls kernel32.dll directly. It is there to make the build a real Windows program, with an import table, and it is not what this page reads.
+
+## What the file does not hold
+
+Build it, run it, and ask each executable whether it is bigger than the array it declares — then give the array one nonzero byte and ask again:
+
+<!-- output:memory_map_zero_fill_sh -->
+*Verified output of [`memory_map_zero_fill_sh.sh`](examples/memory_map_zero_fill_sh.sh) — regenerated by `tools/run_examples.py`, never hand-typed.*
+
+```text
+$ cc -std=c17 -Wall -Wextra -O2 -o layout layout.c
+$ ./layout
+memory map
+limit = 42, over_limit(50) = 1
+scratch: 1048576 bytes, 0 of them nonzero
+remember(7) = 1
+$ compare layout
+layout is smaller than scratch
+$ sed 's/^char scratch\[1 << 20\];/char scratch[1 << 20] = { 1 };/' layout.c > filled.c
+$ grep '^char scratch' layout.c filled.c
+layout.c:char scratch[1 << 20];
+filled.c:char scratch[1 << 20] = { 1 };
+$ cc -std=c17 -Wall -Wextra -O2 -o filled filled.c
+$ ./filled
+memory map
+limit = 42, over_limit(50) = 1
+scratch: 1048576 bytes, 1 of them nonzero
+remember(7) = 1
+$ compare filled
+filled is bigger than scratch
+```
+<!-- /output -->
+
+Both programs have a `scratch` of 1,048,576 bytes when they run. The one whose `scratch` starts as zeros is smaller than its own array — GCC's ELF and clang's Mach-O alike — so the file cannot contain it. Set one byte and the file carries the whole mebibyte, because the linker can no longer describe it as *this many zeros*. That description is what a loader reads: a section has a size in memory and a size in the file, and memory past the file's bytes is zeros. The Memory Map is where Ghidra shows the difference, and the three containers below record it three ways.
+
+## The Windows build
+
+[`demo/build_pe.sh`](demo/build_pe.sh) builds the same source as a 32-bit Windows executable with LLVM's tools — clang, `lld-link`, `llvm-rc` for the version resource in [`demo/layout.rc`](demo/layout.rc), and `llvm-dlltool` for an import library from [`demo/kernel32.def`](demo/kernel32.def). A Mac has clang but not lld, so this page ran it in Docker, in `ubuntu:24.04` with `apt-get install clang lld llvm` (Ubuntu clang 18.1.3):
+
+```bash
+#!/usr/bin/env bash
+# Build layout.c as the kind of file Ghidra's Memory Map help pictures: a 32-bit
+# Windows executable at image base 0x00400000, importing from kernel32.dll, with
+# a version resource. No Windows, no Visual Studio and no C runtime -- clang,
+# lld-link, llvm-rc and llvm-dlltool, which Debian and Ubuntu package as clang,
+# lld and llvm.
+#
+#   demo/build_pe.sh <out dir>            writes <out dir>/layout.exe and layout.pdb
+#
+# A Mac has clang but not lld; the page runs this in Docker. Keep the .pdb beside
+# the .exe: Ghidra's PDB analyzer looks there, and it is where the names come from.
+set -eu
+here=$(cd "$(dirname "$0")" && pwd)
+out=$(cd "${1:-.}" && pwd)
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+cp "$here/layout.c" "$here/layout.rc" "$here/kernel32.def" "$work"/
+cd "$work"
+
+# Relative names from here on: lld-link and llvm-rc take /-options, so an
+# absolute path could be read as one. -debug writes the names to layout.pdb, and
+# the .exe only points at it. -fixed leaves out the relocations, and with them
+# the .reloc section.
+clang --target=i686-pc-windows-msvc -std=c17 -Wall -Wextra -O2 -c -o layout.obj layout.c
+llvm-rc -FO layout.res layout.rc
+llvm-dlltool -m i386 -k -d kernel32.def -l kernel32.lib
+lld-link -nologo -entry:start -subsystem:console -fixed -nodefaultlib -debug -pdb:layout.pdb \
+    -out:layout.exe layout.obj layout.res kernel32.lib
+cp layout.exe layout.pdb "$out"/
+```
+
+What its headers say, before any tool that interprets them:
+
+```text title="Real output — llvm-readobj 18 on layout.exe: four fields of the optional header, then one line per section (fields picked with awk)"
+ImageBase: 0x400000
+SectionAlignment: 4096
+FileAlignment: 512
+SizeOfHeaders: 1024
+.text   VirtualAddress 0x1000   VirtualSize 0x87      PointerToRawData 0x400  SizeOfRawData 0x200
+.rdata  VirtualAddress 0x2000   VirtualSize 0xDF      PointerToRawData 0x600  SizeOfRawData 0x200
+.data   VirtualAddress 0x3000   VirtualSize 0x100004  PointerToRawData 0x800  SizeOfRawData 0x200
+.rsrc   VirtualAddress 0x104000 VirtualSize 0x1E8     PointerToRawData 0xA00  SizeOfRawData 0x200
+```
+
+Four sections, each 0x200 bytes in the file. `.data` is 0x100004 bytes in memory: `limit`, then `scratch`, with no `.bss` — lld-link put the zero-filled array at the end of `.data`, so one section holds both kinds of bytes, which is exactly the situation the help's picture draws as two rows. `-fixed` is why there is no fifth section; the same build without it:
+
+```text title="Real output — llvm-readobj 18, the section names of the same build linked without -fixed"
+.text .rdata .data .rsrc .reloc 
+```
+
+## What Ghidra 12.1.3 lists
+
+[`demo/memory_map.sh`](demo/memory_map.sh) hands a program to the headless analyzer with [`MemoryMapTour.java`](demo/MemoryMapTour.java), which prints a row per block in the window's column order — `x` for a checked box — and then changes the map the ways the window's checkboxes and buttons do, printing what each change did:
+
+```bash
+#!/usr/bin/env bash
+# Hand a program to Ghidra's headless analyzer and print its memory map as
+# MemoryMapTour.java reads it: the rows, then what unchecking W, checking
+# Volatile, adding an overlay and setting the image base each did.
+#
+#   demo/memory_map.sh              the clang -O2 build of layout.c, on this machine
+#   demo/memory_map.sh <binary>     an executable built elsewhere -- build_pe.sh's
+#                                   layout.exe, or GCC's ELF from Docker
+#
+# Needs a Ghidra install. Homebrew's is found through `brew --prefix ghidra`;
+# any other one through GHIDRA_INSTALL_DIR, the folder holding support/.
+set -eu
+here=$(cd "$(dirname "$0")" && pwd)
+ghidra=${GHIDRA_INSTALL_DIR:-$(brew --prefix ghidra)/libexec}
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+if [ $# -ge 1 ]; then
+    binary=$1
+else
+    binary=$work/layout
+    cc -std=c17 -Wall -Wextra -O2 -o "$binary" "$here/layout.c"
+fi
+
+"$ghidra/support/analyzeHeadless" "$work" layout -import "$binary" \
+    -scriptPath "$here" \
+    -postScript MemoryMapTour.java "$work/tour.txt" \
+    -deleteProject > "$work/ghidra.log" 2>&1 || { cat "$work/ghidra.log"; exit 1; }
+
+# A post-script that throws does not fail analyzeHeadless; a missing file does.
+[ -s "$work/tour.txt" ] || { cat "$work/ghidra.log"; exit 1; }
+cat "$work/tour.txt"
+```
+
+Everything Ghidra printed on this page was produced on 2026-09-14 by Ghidra 12.1.3 from Homebrew on OpenJDK 25, on an x86-64 Mac running macOS 26 with Apple clang 21. CI does not run it — the runners have no Ghidra — so each block is a *Real output* fence that says so. The Windows program is `build_pe.sh`'s, with its `layout.pdb` beside it, where Ghidra's PDB analyzer looks for the names:
+
+```text title="Real output — Ghidra 12.1.3 headless on layout.exe and layout.pdb, the tour's first table"
+== The rows, image base 00400000
+Name     Start     End       Length    R  W  X  Volatile  Artificial  Overlayed  Type     Init  Byte Source
+Headers  00400000  004003ff  0x400     x  -  -  -         -                      Default  x     layout.exe[0x0, 0x400]
+.text    00401000  004011ff  0x200     x  -  x  -         -                      Default  x     layout.exe[0x400, 0x200]
+.rdata   00402000  004021ff  0x200     x  -  -  -         -                      Default  x     layout.exe[0x600, 0x200]
+.data    00403000  00503003  0x100004  x  x  -  -         -                      Default  x     layout.exe[0x800, 0x200] + init[0xffe04]
+.rsrc    00504000  005041ff  0x200     x  -  -  -         -                      Default  x     layout.exe[0xa00, 0x200]
+tdb      ffdff000  ffdfffff  0x1000    x  x  -  -         x                      Default  x     init[0x1000]
+```
+
+| Row | What it is |
+|---|---|
+| `Headers` | the file's first 0x400 bytes — the MZ and PE headers and the section table — mapped at the image base; 0x400 is the header's `SizeOfHeaders`. Readable only |
+| `.text` | the code, from file offset 0x400. Readable and executable |
+| `.rdata` | `greeting`, and what the linker adds that is only ever read: the import table the calls to kernel32 go through, and the debug directory, whose CodeView entry records the path the linker wrote `layout.pdb` to — a temporary folder inside the container; Ghidra found the file beside `layout.exe` instead |
+| `.data` | `limit` and `scratch`: 0x200 bytes from file offset 0x800, then 0xffe04 bytes that are not in the file — two sources, as **Byte Source** says, in one row |
+| `.rsrc` | the version resource |
+| `tdb` | not in the file at all. Analysis made it — the headless log lists the *Windows x86 Thread Environment Block (TEB) Analyzer* — and put labels in it for the fields of a thread's environment block, `ExceptionList`, `StackBase`, `StackLimit` and the rest; it is marked **Artificial**, a block that exists for the analysis and in no file |
+
+The lengths are the file's. The header says `.text` holds 0x87 bytes of code; Ghidra's row is 0x200, because 12.1.3's PE parser grows a section's virtual size to cover all of its bytes in the file, up to the next section boundary ([`FileHeader.java` ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Base/src/main/java/ghidra/app/util/bin/format/pe/FileHeader.java#L369-L383)), so the linker's padding after the last function is mapped too.
+
+## Against the help's picture
+
+Read the same way, the picture disagrees with 12.1.3 twice.
+
+**`Headers` is not executable.** 12.1.3's loader creates the block with `r = true`, `w = false`, `x = false` — [`PeLoader.java` ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Base/src/main/java/ghidra/app/util/opinion/PeLoader.java#L643-L652) — and 11.0.3's did the same ([the same lines in 11.0.3 ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_11.0.3_build/Ghidra/Features/Base/src/main/java/ghidra/app/util/opinion/PeLoader.java#L637-L646)). The file gives it nothing else to go on: a PE header carries permissions for each section, and none for the headers. Whatever loaded the picture's program, it was not either of these.
+
+**One `.data`, not two.** 11.0.3's loader made a section's bytes from the file one block and, when the section is bigger in memory, the *remainder of virtual size* a second block with the same name — uninitialized ([11.0.3's code ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_11.0.3_build/Ghidra/Features/Base/src/main/java/ghidra/app/util/opinion/PeLoader.java#L689-L718)). That is the picture's second `.data`, **Initialized** unchecked. From 11.1 the remainder is created initialized, filled with zeros, and joined onto the first block ([12.1.3's code ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Base/src/main/java/ghidra/app/util/opinion/PeLoader.java#L715-L739)) — which is `layout.exe[0x800, 0x200] + init[0xffe04]` above. The split did not go away; it moved from the list of rows into the **Byte Source** column.
+
+## Three containers, three ways to write zeros
+
+The same source, loaded from each container. Where `scratch` landed — the Windows build, then GCC's ELF, then clang's Mach-O:
+
+```text title="Real output — the tour's Where scratch landed line on layout.exe, on the ELF GCC 14.4.0 built at -O2 in Docker's gcc:14 image, and on the clang -O2 Mach-O"
+scratch is at 00403004 in .data, initialized: x, first byte: 00
+scratch is at 00404060 in .bss, initialized: -, first byte: ??
+scratch is at 100002010 in __common, initialized: x, first byte: 00
+```
+
+```text title="Abridged — real output, Ghidra 12.1.3 on the GCC 14.4.0 ELF: the rows around the data, and two of the sections no loader maps"
+Name                Start                         End                           Length    R  W  X  Volatile  Artificial  Overlayed  Type     Init  Byte Source
+.text               00401050                      00401269                      0x21a     x  -  x  -         -                      Default  x     layout-elf[0x1050, 0x21a]
+.rodata             00402000                      00402083                      0x84      x  -  -  -         -                      Default  x     layout-elf[0x2000, 0x84]
+.data               00404010                      00404023                      0x14      x  x  -  -         -                      Default  x     layout-elf[0x3010, 0x14]
+.bss                00404040                      0050405f                      0x100020  x  x  -  -         -                      Default  -     uninit[0x100020]
+EXTERNAL            00505000                      0050501f                      0x20      x  x  -  -         x                      Default  -     uninit[0x20]
+.comment            .comment::00000000            .comment::00000011            0x12      -  -  -  -         -           OTHER      Default  x     layout-elf[0x3024, 0x12]
+.symtab             .symtab::00000000             .symtab::000003bf             0x3c0     -  -  -  -         -           OTHER      Default  x     layout-elf[0x3038, 0x3c0]
+```
+
+```text title="Real output — Ghidra 12.1.3 on the clang -O2 Mach-O, every row"
+== The rows, image base 100000000
+Name           Start      End        Length   R  W  X  Volatile  Artificial  Overlayed  Type     Init  Byte Source
+__TEXT         100000000  1000005af  0x5b0    x  -  x  -         -                      Default  x     layout[0x0, 0x5b0]
+__text         1000005b0  100000715  0x166    x  -  x  -         -                      Default  x     layout[0x5b0, 0x166]
+__stubs        100000716  10000072f  0x1a     x  -  x  -         -                      Default  x     layout[0x716, 0x1a]
+__const        100000730  10000074b  0x1c     x  -  -  -         -                      Default  x     layout[0x730, 0x1c]
+__cstring      10000074c  1000007b3  0x68     x  -  -  -         -                      Default  x     layout[0x74c, 0x68]
+__unwind_info  1000007b4  100000fff  0x84c    x  -  -  -         -                      Default  x     layout[0x7b4, 0x84c]
+__got          100001000  10000100f  0x10     x  x  -  -         -                      Default  x     layout[0x1000, 0x10]
+__DATA_CONST   100001010  100001fff  0xff0    x  x  -  -         -                      Default  x     layout[0x1010, 0xff0]
+__data         100002000  100002003  0x4      x  x  -  -         -                      Default  x     layout[0x2000, 0x4]
+__DATA         100002004  10000200f  0xc      x  x  -  -         -                      Default  x     layout[0x2004, 0xc]
+__common       100002010  100002fff  0xff0    x  x  -  -         -                      Default  x     layout[0x2010, 0xff0]
+__common       100003000  10010200f  0xff010  x  x  -  -         -                      Default  -     uninit[0xff010]
+__DATA         100102010  100102fff  0xff0    x  x  -  -         -                      Default  -     uninit[0xff0]
+__LINKEDIT     100103000  1001031e7  0x1e8    x  -  -  -         -                      Default  x     layout[0x3000, 0x1e8]
+__LINKEDIT     1001031e8  100103fff  0xe18    x  -  -  -         -                      Default  -     uninit[0xe18]
+```
+
+| Container | Where the linker put the zeros | What the Memory Map shows |
+|---|---|---|
+| PE, from lld-link | the end of `.data` | one row, **Byte Source** `file + init[…]`, **Initialized** checked; `scratch` reads `00` |
+| ELF, from GNU ld | a section of its own, `.bss` | a row of its own, `uninit[0x100020]`, **Initialized** unchecked; `scratch` reads `??` |
+| Mach-O, from Apple's ld | `__common`, in the `__DATA` segment | two rows named `__common`: 0xff0 bytes from the file, then `uninit[0xff010]` |
+
+`??` is Ghidra's way of printing a byte that has no value: the Memory API throws when asked for it, and the tour prints the question marks. The Mach-O's two `__common` rows are the shape of the help's two `.data` rows, for a different reason: the start of `__common` falls inside the last page of `__DATA` that the file does hold — file offsets 0x2010 to 0x2fff, zeros — so those bytes come from the file, and the rest has none.
+
+The ELF adds two kinds of row the other containers do not. `.comment`, `.symtab` and the rest are sections no loader maps, so Ghidra gives each its own overlay on a space called `OTHER`: they have addresses, and take none in `ram`. And `EXTERNAL` is **Artificial**, like the PE's `tdb` — Ghidra made it, 0x20 bytes with no source, and nothing in the file describes it.
+
+## The checkboxes the decompiler reads
+
+The tour decompiles `over_limit` three times: as loaded, after unchecking **W** on the block that holds `limit`, and after checking **Volatile** as well:
+
+```text title="Real output — the tour on layout.exe"
+== over_limit, decompiled with .data as loaded (limit at 00403000, Respect read-only flags: on)
+(analysis left only a label at 00401000; the script made the function _over_limit there)
+bool _over_limit(int param_1)
+
+{
+  return _limit < param_1;
+}
+
+== over_limit, after unchecking W on .data
+bool _over_limit(int param_1)
+
+{
+  return 0x2a < param_1;
+}
+
+== over_limit, W still unchecked, Volatile checked
+bool _over_limit(int param_1)
+
+{
+  int iVar1;
+  
+  iVar1 = _limit;
+  return iVar1 < param_1;
+}
+```
+
+As loaded, `.data` is writable, so `_limit` is a variable — something may have changed it since the program started — and the decompiler reads it. Uncheck **W** and the same function is `0x2a < param_1`: the value in the file, 42, folded into the comparison. That is the decompiler's *Respect read-only flags* option, on by default, which [Ghidra's decompiler options ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Decompiler/src/main/help/help/topics/DecompilePlugin/DecompilerOptions.html) describe as treating any value in memory marked read-only as constant. Nothing in the program changed; Ghidra's belief about the block did. It is the right belief for a table nothing writes that happens to sit in a writable section, and a wrong one everywhere else — the code reads simpler than it runs.
+
+Check **Volatile** as well and the read comes back, on a line of its own: `iVar1 = _limit;`. [Program annotations ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Decompiler/src/main/help/help/topics/DecompilePlugin/DecompilerAnnotations.html) calls this the *volatile* mutability: memory that can change without the code writing it, and whose every access may have side effects — a device register — so each access is its own statement. Volatile wins over read-only. The ELF and Mach-O builds printed the same three functions, under the names `limit` and `_limit`.
+
+The first line of the block is the tour's own. Nothing in the Windows program calls `over_limit` — `start` does the comparison itself — so analysis left only the PDB's label at 00401000, and the script made the function there, as pressing **F** on the label in the Listing does.
+
+A script that decompiles has to ask for the option. [`DecompileOptions` ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Decompiler/src/main/java/ghidra/app/decompiler/DecompileOptions.java) defaults it to on, but a `DecompInterface` that is never handed any options does not respect read-only flags: the tour's first draft, without `setOptions`, printed `_limit < param_1` before and after unchecking **W**. `MemoryMapTour.java` builds its options with `grabFromProgram`, and its heading line reports the setting.
+
+## Add, with Overlay checked
+
+The tour adds a block called `OV1` at `over_limit`'s address, 0x100 bytes, readable, with **Overlay** checked — the picture's `OV1`, down to the permissions:
+
+```text title="Real output — the tour on layout.exe, after the Add"
+== After Add: OV1, an overlay on the 0x100 bytes from over_limit at 00401000
+Name     Start          End            Length    R  W  X  Volatile  Artificial  Overlayed  Type     Init  Byte Source
+Headers  00400000       004003ff       0x400     x  -  -  -         -                      Default  x     layout.exe[0x0, 0x400]
+.text    00401000       004011ff       0x200     x  -  x  -         -                      Default  x     layout.exe[0x400, 0x200]
+.rdata   00402000       004021ff       0x200     x  -  -  -         -                      Default  x     layout.exe[0x600, 0x200]
+.data    00403000       00503003       0x100004  x  x  -  -         -                      Default  x     layout.exe[0x800, 0x200] + init[0xffe04]
+.rsrc    00504000       005041ff       0x200     x  -  -  -         -                      Default  x     layout.exe[0xa00, 0x200]
+tdb      ffdff000       ffdfffff       0x1000    x  x  -  -         x                      Default  x     init[0x1000]
+OV1      OV1::00401000  OV1::004010ff  0x100     x  -  -  -         -           ram        Default  x     init[0x100]
+```
+
+`OV1` runs from `OV1::00401000` to `OV1::004010ff`: the same numbers as the start of `.text`, in an address space of its own named after the block, and **Overlayed** says which space it shadows — `ram`, Ghidra's name for the processor's own addresses. A Default block at those addresses would be refused, because Default blocks may not overlap; an overlay holds a second set of bytes for addresses that already have some, which the help's page names as its use — a range that holds different code or data at different times.
+
+## Set Image Base
+
+Last, the tour moves the image base up by 0x10000000:
+
+```text title="Real output — the tour on layout.exe, after Set Image Base"
+== After Set Image Base 10400000
+Name     Start          End            Length    R  W  X  Volatile  Artificial  Overlayed  Type     Init  Byte Source
+tdb      0fdff000       0fdfffff       0x1000    x  x  -  -         x                      Default  x     init[0x1000]
+Headers  10400000       104003ff       0x400     x  -  -  -         -                      Default  x     layout.exe[0x0, 0x400]
+.text    10401000       104011ff       0x200     x  -  x  -         -                      Default  x     layout.exe[0x400, 0x200]
+.rdata   10402000       104021ff       0x200     x  -  -  -         -                      Default  x     layout.exe[0x600, 0x200]
+.data    10403000       10503003       0x100004  x  x  -  -         -                      Default  x     layout.exe[0x800, 0x200] + init[0xffe04]
+.rsrc    10504000       105041ff       0x200     x  -  -  -         -                      Default  x     layout.exe[0xa00, 0x200]
+OV1      OV1::00401000  OV1::004010ff  0x100     x  -  -  -         -           ram        Default  x     init[0x100]
+over_limit is now at 10401000; OV1 still starts at OV1::00401000
+```
+
+Every block in `ram` moved by the same amount — `over_limit` from 00401000 to 10401000 — and `OV1` did not: the help warns that overlay blocks do not relocate with the image base, and this is the row that stayed. `tdb` moved too, and wrapped: ffdff000 plus 0x10000000 does not fit in 32 bits, and it landed at 0fdff000, which sorts it to the top. In the ELF, the `OTHER` overlays stayed at 00000000 in the same way. Rebasing is what makes Ghidra's addresses match a debugger's when the program was loaded somewhere other than its preferred base; the rows are how you check what moved.
+
+## If you are coming from another language
+
+**Rust.** A Rust `static` is what this program's globals are: one object at one address, so it lives in one of these rows. The Rust library's [`const` and `static` ↗](https://masiarek.github.io/rust-learning-library/27_Modules/const_and_static/index.html) measures the difference from a `const`, which is substituted at every use and has no address of its own for a row to hold. Which row a `static` lands in is not Rust's decision: [The linker ↗](https://masiarek.github.io/rust-learning-library/20_Compilers/the_linker/index.html) is the stage after `rustc` that lays the sections out.
+
+**Python.** A Python program is not laid out in blocks — the interpreter is. But `mmap` makes a loader's two requests at run time: memory backed by a file or by nothing, readable or writable.
+
+<!-- output:memory_map_mmap_py -->
+*Verified output of [`memory_map_mmap_py.py`](examples/memory_map_mmap_py.py) — regenerated by `tools/run_examples.py`, never hand-typed.*
+
+```text
+anonymous map: 1048576 bytes, 0 nonzero
+file map: 4 bytes, limit = 42
+write refused: mmap can't modify a readonly memory map.
+```
+<!-- /output -->
+
+The anonymous map is `scratch`: a mebibyte of zeros that no file holds. The file map is `limit` loaded read-only: its bytes are the file's, and the write is refused with Python's own `TypeError`. That is the difference from the checkbox on this page — unchecking **W** in Ghidra refuses nothing, and only changes what the decompiler may assume.
+
+**ABAP.** *(Not machine-checked — CI cannot run ABAP.)* There is no loader, no image base and no sections to see. An ABAP program's generated load is kept by the kernel in a shared program buffer and run from there; the monitors that show that buffer report how big it is and how full, not what each byte is.
+
+## See also
+
+- Ghidra's help at the installed tag: [Memory Map ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Base/src/main/help/help/topics/MemoryMapPlugin/Memory_Map.htm) — the page this lesson reads, with every action on the toolbar; [decompiler options ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Decompiler/src/main/help/help/topics/DecompilePlugin/DecompilerOptions.html) and [program annotations ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Decompiler/src/main/help/help/topics/DecompilePlugin/DecompilerAnnotations.html) for read-only and volatile memory
+- [`PeLoader.java` in 12.1.3 ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Features/Base/src/main/java/ghidra/app/util/opinion/PeLoader.java) and [in 11.0.3 ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_11.0.3_build/Ghidra/Features/Base/src/main/java/ghidra/app/util/opinion/PeLoader.java) — the two loaders compared above — and [`Memory` ↗](https://github.com/NationalSecurityAgency/ghidra/blob/Ghidra_12.1.3_build/Ghidra/Framework/SoftwareModeling/src/main/java/ghidra/program/model/mem/Memory.java), the interface the tour's changes go through
+- [PE ↗](https://masiarek.github.io/encodings-learning-library/16_Formats/pe/index.html#two-addresses-for-every-byte), [ELF ↗](https://masiarek.github.io/encodings-learning-library/16_Formats/elf/index.html) and [Mach-O ↗](https://masiarek.github.io/encodings-learning-library/16_Formats/mach_o/index.html) in the encodings library — the headers the rows come from, byte by byte, and the section table that turns an address in memory into an offset in the file
+- [What the decompiler recovers](../what_the_decompiler_recovers/README.md) — the decompiler whose output the **W** and **Volatile** checkboxes changed, and what it can and cannot give back
+- [What the symbol table lists](../what_the_symbol_table_lists/README.md) — the names that sit in these blocks, `_limit` and `_over_limit` among them, and where each one came from
